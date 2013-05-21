@@ -22,7 +22,7 @@ define("NO_OUTPUT_BUFFERING", true);
 require_once $path."configuration.php";
 
 if (!isset($_SESSION['s_login']) || !eF_checkParameter($_SESSION['s_login'], 'login')) {
-	echo "No active session found";
+	echo json_encode(array('status' => 0, 'code' => -1));
 	exit;
 }
 try {

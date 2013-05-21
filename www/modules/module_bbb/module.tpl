@@ -258,7 +258,7 @@
                             {if $meeting.status == "0"}
                             	<img border = "0" src = "{$T_BBB_MODULE_BASELINK}images/server_client_exchange.png" class = "inactiveImage" title = "{$smarty.const._BBBJOINMEETING}" alt = "{$smarty.const._BBBJOINMEETING}" />
                             {elseif $meeting.status == "1" }
-                            	<a href = "{$meeting.joiningUrl}"  class = "editLink"><img border = "0" src = "{$T_BBB_MODULE_BASELINK}images/server_client_exchange.png" title = "{$smarty.const._BBBJOINMEETING}" alt = "{$smarty.const._BBBJOINMEETING}" /></a>
+                            	<a target = "_blank" href = "{$meeting.joiningUrl}"  class = "editLink"><img border = "0" src = "{$T_BBB_MODULE_BASELINK}images/server_client_exchange.png" title = "{$smarty.const._BBBJOINMEETING}" alt = "{$smarty.const._BBBJOINMEETING}" /></a>
                            	{/if}
                          {/if}
                     </td>

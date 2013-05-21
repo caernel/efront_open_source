@@ -1,4 +1,5 @@
 {capture name = "t_reports_code"}
+	{if !$T_HIDE_FILTERS}
 		<table class = "statisticsSelectList">
             <tr><td class = "labelCell">{$smarty.const._FILTERBYLESSON}:</td>
                 <td class = "elementCell" colspan = "4">
@@ -35,7 +36,7 @@
                 </td>
             </tr>
 		</table>
-
+	{/if}
 <!--ajax:reportsTable-->
 						<table size = "{$T_TABLE_SIZE}" width = "100%" sortBy = "0" order = "asc" id = "reportsTable" class = "sortedTable" useAjax = "1" url = "{$smarty.server.PHP_SELF}?ctg=statistics&option=tincan&sel_verb={$smarty.get.sel_verb}&sel_object={$smarty.get.sel_object}&sel_user={$smarty.get.sel_user}&sel_lesson={$smarty.get.sel_lesson}&">
 					        <tr class = "topTitle">

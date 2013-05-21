@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (is_file($GLOBALS['path']."language/custom-french.php.inc")) {
 include($GLOBALS['path']."language/custom-french.php.inc");
 }

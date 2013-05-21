@@ -3601,7 +3601,7 @@ define("_ENDDATE", "Ημερομηνία τερματισμού");
 define("_SELECTSKILLCATEGORY", "Επιλέξτε κατηγορία προσόντος");
 define("_NOHEADERROWISDEFINEDORHEADERROWNOTCOMPATIBLEWITHIMPORTTYPE","Δεν έχει οριστεί γραμμή τίτλων ή η ορισμένη γραμμή τίτλων δεν είναι συμβατή με τον τύπο εισαγωγής που επιλέξατε");
 define("_IMPORTEDUSER","Εισαγωγή του χρήστη");
-define("_USERSTOCOURSES","Αναθέσεις μαθημάτων σε χρήστες");
+define("_USERSTOCOURSES","Αναθέσεις δεσμών σε χρήστες");
 define("_USERSTOGROUPS","Αναθέσεις ομάδων σε χρήστες");
 define("_IMPORTANYTHING","Οτιδήποτε μπορεί να αναγνωριστεί");
 define("_DATATOIMPORT","Δεδομένα προς εισαγωγή");
@@ -4295,4 +4295,7 @@ define("_FILTERBYOBJECT","Φίλτρο αντικειμένου (object)");
 define("_SELECTOBJECTFROMLIST", "Επιλέξτε ένα αντικείμενα από τη λίστα");
 define("_SELECTVERBFROMLIST", "Επιλέξτε ένα ρήμα από τη λίστα");
 define("_GOTO", "Μετάβαση σε");
+define("_USERSTOLESSONS", "Αναθέσεις μαθημάτων σε χρήστες");
+define("_NEWLESSONASSIGNMENT", "Νέα ανάθεση μαθήματος");
+define("_COULDNOTFINDLESSON", "Το μάθημα δε βρέθηκε");
 ?>

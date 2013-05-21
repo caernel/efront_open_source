@@ -282,8 +282,9 @@ function eF_truncatePath($string, $length = 40, $pathLimit = 6, $etc = '...', $d
  * @param boolean $duplicate Whether to resolve duplicates by adding the login in the end of the string
  * @return string The formatted string
  * @since 3.6.0
+ * @deprecated
  */
-function formatLogin($login, $fields = array(), $duplicate = true) {
+function formatLogin_old($login, $fields = array(), $duplicate = true) {
     //The function is usually called by a filter, which passes a preg matches array, where index 1 holds the login
     !is_array($login) OR $login = $login[1];
 
@@ -331,6 +332,44 @@ function formatLogin($login, $fields = array(), $duplicate = true) {
 	    	return $login;
 	    }
     }
+}
+
+function formatLogin($login, $fields = array(), $duplicate = true) {
+    //The function is usually called by a filter, which passes a preg matches array, where index 1 holds the login
+	!is_array($login) OR $login = $login[1];
+	
+	if (!eF_checkParameter($login, 'login')) {
+		return $login;
+	}
+	
+	$roles = EfrontUser :: getRoles(true);
+    $tags = array('#surname#', '#name#', '#login#', '#n#', '#type#');
+	if (function_exists('apc_fetch') && $usernames = apc_fetch(G_DBNAME.':_usernames')) {
+		$GLOBALS['_usernames'] = $usernames;
+	}
+	if (isset($fields['formatted_login'])) {
+		$GLOBALS['_usernames'][$login] = $fields['formatted_login'];
+	} else if (!empty($fields)) {
+		$replacements = array($fields['surname'], $fields['name'], $fields['login'], mb_substr($fields['name'], 0, 1), $roles[$fields['user_type']]);
+		$format       = str_replace($tags, $replacements, $GLOBALS['configuration']['username_format']);
+		
+		$GLOBALS['_usernames'][$login] = $format;
+	} else if (!isset($GLOBALS['usernames'][$login])) {
+		$result = eF_getTableData("users", "login, name, surname, user_type", "login='{$login}'");
+		if (sizeof($result) == 0) {
+			return $login;
+		}
+		$replacements = array($result[0]['surname'], $result[0]['name'], $result[0]['login'], mb_substr($result[0]['name'], 0, 1), $roles[$result[0]['user_type']]);
+		$format       = str_replace($tags, $replacements, $GLOBALS['configuration']['username_format']);
+		
+		$GLOBALS['_usernames'][$login] = $format;
+	}
+	
+	if (function_exists('apc_store')) {
+		apc_store(G_DBNAME.':_usernames', $GLOBALS['_usernames']);
+	}
+	
+	return $GLOBALS['_usernames'][$login];
 }
 
 
@@ -1573,7 +1612,7 @@ function eF_filterHcdData($dataSource, $filter, $userField = false) {
 
     $filters = explode("||||", $filter);
 
-    if ($filters[0] != "") {
+    if ($filters[0] != "" && $filters[0] != _FILTER."...") {
     	$dataSource = eF_filterData($dataSource, $filters[0]);	// the default filter
     }
 

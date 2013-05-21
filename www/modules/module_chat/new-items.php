@@ -72,7 +72,7 @@ function getConnectedUsers(){
 
 			$value['login'] = $value['users_LOGIN'];
 			$usersOnline[] = array('login' => $value['users_LOGIN'],
-								 'formattedLogin'=> formatLogin(false, $value),
+								 'formattedLogin'=> formatLogin($value['login'], $value),
 								 'user_type' => $value['user_type'],
 								 'timestamp_now' => $value['timestamp_now'],
 								 'time' => eF_convertIntervalToTime(time() - $value['session_timestamp']));

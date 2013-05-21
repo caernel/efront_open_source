@@ -1,3 +1,38 @@
+=== Version 3.6.13.2 - build 18005 ===
+- Added ability to import users-to-lessons assignments from CSV file
+- Added ability for a module to restrict access to a course
+- Added ability to expand random pool and 1-by-1 questions, when previewing an unsolved test as professor
+- Added ability to display correct answers when previewing or printing a test, as a professor
+- Added onCompleteUnit() module function
+- Added onRemoveUsersFromCourse() module function
+- Fixed system unzip not overwriting files
+- Fixed chat module conflicting with new popups
+- Fixed "training reports" module not working under certain cases
+- Fixed performance issue with formatted usernames
+- Fixed auto-logout browser when session is lost
+- Fixed administrator not being able to handle custom certificates created by other user
+- Fixed text not wrapping inside certificates when course name is too long
+- Fixed editing a branch loses its parent branch association
+- Fixed user form not displaying user's avatar picture
+- Fixed user progress popup not displaying user's name
+- Fixed updating system email upon installation
+- Fixed disappeared search box in default theme
+- Fixed branch url error when a branch url is not defined
+- Fixed new installations reporting previous database version number
+- Fixed autocompleting users list not displaying
+- Fixed online users not displaying properly
+- Fixed avatars list in user's profile not autoclosing when selecting an avatar
+- Fixed bookmakrs popup not working
+- Fixed tincan import message
+- Fixed educational edition error when viewing user profile
+- Fixed facebook empty tab appearing in community edition
+- Fixed not being able to access a course's lessons, when a student has enrolled as a professor and the course has prerequisites
+- Fixed event reports not working for course filters
+- If a default timezone is not set for a user account, the timezone dropdown will have pre-selected the default timezone
+- "Selected Courses" block is now hidden when empty
+- The lesson's print settings no longer affect professors
+- Performance updates
+
 === Version 3.6.13.1 - build 18000 ===
 - Added Tincan (XAPI) support (Commercial editions)
 - Added the Simple/complete mode that allows for hiding unnecessary functionality
@@ -45,7 +80,6 @@ XML API:
 - Updated apidemo2.php to include new features
 
 Various updates:
-
 - Fixed performance issue in payments page
 - Fixed issue about deleting first execution of test when clicking on "Redo" test option
 - Fixed issue about viewing certificates in personal page

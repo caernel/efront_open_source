@@ -35,3 +35,14 @@ function installModule(el, module) {
 function onInstallModule(el, response) {
 	location.reload();
 }
+
+function exportModule(el, id) {
+	parameters = {export_module:id, method: 'get'};
+	var url    = location.toString();
+	ajaxRequest(el, url, parameters, onExportModule);		
+}
+function onExportModule(el, response) {
+	//window.open()
+	$('popup_frame').src = 'view_file.php?file='+response;
+	//alert(response);
+}

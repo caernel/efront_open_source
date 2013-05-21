@@ -28,6 +28,8 @@ try {
 					setcookie('c_request', $_SESSION['s_type'].'.php?lessons_ID='.$lessonID, time() + 300);
 				}
             }
+            EfrontEvent::triggerEvent(array("type" => EfrontEvent::SYSTEM_VISITED, "users_LOGIN" => $newUser -> user['login'], "users_name" => $newUser -> user['name'], "users_surname" => $newUser -> user['surname']));
+            
 			unset($_SESSION['referer']);
 			$redirectPage = $GLOBALS['configuration']['login_redirect_page'];
 			if ($redirectPage == "user_dashboard" && $newUser -> user['user_type'] != "administrator") {

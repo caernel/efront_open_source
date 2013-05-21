@@ -247,6 +247,7 @@ class module_security extends EfrontModule {
     	$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(G_ROOTPATH), RecursiveIteratorIterator::SELF_FIRST);
     	foreach($objects as $name => $object){
     		if (pathinfo($name, PATHINFO_EXTENSION) == 'php' && strpos(pathinfo($name, PATHINFO_DIRNAME), 'libraries/smarty/themes_cache/') === false) {
+    			$name = str_replace("\\", "/", $name);	
     			$files[str_replace(G_ROOTPATH, '', $name)] = md5_file($name);
     		}
     	}

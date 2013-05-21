@@ -959,10 +959,7 @@ if (top.sideframe && top.sideframe.document.getElementById('hasLoaded')) {
 
 {*-----------------------------Part 3: Display table-------------------------------------------------*}
 <div id = "bookmarks_div_code" style = "display:none">
-{capture name = "t_bookmarks_code"}
 	<div id = "bookmarks_div"></div>
-{/capture}
-{eF_template_printBlock title = $smarty.const._SHOWBOOKMARKS data = $smarty.capture.t_bookmarks_code image = "32x32/bookmark.png"}
 </div>
 
 

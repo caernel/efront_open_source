@@ -5,7 +5,7 @@
     <tr>
 {section name = 'avatars_list' loop = $T_SYSTEM_AVATARS}
         <td align = "center">
-            <a href = "javascript:void(0)" onclick = "top.mainframe.document.getElementById('select_avatar').selectedIndex = {$smarty.section.avatars_list.index}{if $T_SOCIAL_INTERFACE}+1{/if};top.mainframe.document.getElementById('popup_close').onclick();window.close();">
+            <a href = "javascript:void(0)" onclick = "top.mainframe.document.getElementById('select_avatar').selectedIndex = {$smarty.section.avatars_list.index}{if $T_SOCIAL_INTERFACE}+1{/if};parent.eF_js_showDivPopup('','');">
             <img src = "{$smarty.const.G_SYSTEMAVATARSURL}{$T_SYSTEM_AVATARS[avatars_list]}" border = "0" / >
             <br/>{$T_SYSTEM_AVATARS[avatars_list]}</a>
         </td>

@@ -172,7 +172,7 @@ if (typeof(currentUserLogin) == 'undefined') var currentUserLogin ='';
 	{if !isset($T_DATASOURCE_OPERATIONS) || in_array('progress', $T_DATASOURCE_OPERATIONS)}
 		{if (!isset($T_CURRENT_USER->coreAccess.course_settings) || $T_CURRENT_USER->coreAccess.course_settings == 'change')}
 
-				<a href = "{$smarty.server.PHP_SELF}?{$T_BASE_URL}&op=course_certificates&edit_user={$user.login}&popup=1" target = "POPUP_FRAME" onclick = "eF_js_showDivPopup(event, '{$smarty.const._PROGRESS}', 2)" title = "{$smarty.const._VIEWUSERLESSONPROGRESS}">
+				<a href = "{$smarty.server.PHP_SELF}?{$T_BASE_URL}&op=course_certificates&edit_user={$user.login}&popup=1" target = "POPUP_FRAME" onclick = "eF_js_showDivPopup(event, '{$user.login|formatLogin}', 2)" title = "{$smarty.const._VIEWUSERLESSONPROGRESS}">
 					<img src = "images/16x16/users.png" title = "{$smarty.const._VIEWUSERCOURSEPROGRESS}" alt = "{$smarty.const._VIEWUSERCOURSEPROGRESS}"/>
 				</a>
 		{/if}

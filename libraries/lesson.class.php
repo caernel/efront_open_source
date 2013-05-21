@@ -3260,7 +3260,7 @@ class EfrontLesson
 
 		// The lesson offers skill record remains the same
 		if ($lessonSkillId) {
-			eF_updateTableData("module_hcd_skills", array("description" => _KNOWLEDGEOFLESSON . " ". $this -> lesson['name'] , "categories_ID" => -1), "skill_ID = ". $lessonSkillId['skill_ID']);
+			eF_updateTableData("module_hcd_skills", array("description" => _KNOWLEDGEOFLESSON . " ". $this -> lesson['name'] , "categories_ID" => -1), "skill_ID = ". $lessonSkillId);
 		}
 
 		if ($data['questions']) {
@@ -5178,7 +5178,15 @@ class EfrontLesson
 			}
 
 			// The default lesson skill was not found
-			return $this -> insertLessonSkill();
+			$this -> insertLessonSkill();
+			$skills = $this -> getSkills();
+			// In case of a change from enterprise to educational version, extra skills with cat_ID != -1 might be correlated with this lesson
+			foreach ($skills as $skid => $skill) {
+				if ($skill['lesson_ID'] == $this -> lesson['id'] && $skill['categories_ID'] == -1) {
+					return $skill;
+				}
+			}
+				
 		} #cpp#endif
 		return false;
 	}

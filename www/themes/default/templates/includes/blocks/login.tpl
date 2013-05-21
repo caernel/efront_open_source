@@ -45,9 +45,6 @@
      </form>
 {if $T_OPEN_FACEBOOK_SESSION && !$T_NO_FACEBOOK_LOGIN}        
   	<div id="fb-root"></div>
-	        	<!-- <button class="fb_login">Login with Facebook</button>  -->
-	        	<!-- <span ><a id="fb_login" class="fb_button fb_button_medium"><span class="fb_button_text">Login with Facebook</span></a></span>     --> 
-	        	 <button class="fb_button fb_button_medium fb_login" style="position: relative;left: 10px;"><span class="fb_button_text">{$smarty.const._LOGIN}</span></button>
-	        	 
+	        	 <button class="fb_login flatButton">Login with Facebook</button>       	 
 {/if}       	  
 

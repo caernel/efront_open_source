@@ -840,8 +840,8 @@ if (isset($_GET['excel']) && $_GET['excel'] == 'user') {
 				$result = EfrontStats :: getStudentsDoneTests($courseLessons, $infoUser -> user['login']);
 
 				$userDoneTests = array();
-				foreach ($result[$infoUser -> user['login']] as $value) {
-					$userDoneTests[$value['lessons_ID']][] = $value;
+				foreach ($result[$infoUser -> user['login']] as $test) {
+					$userDoneTests[$test['lessons_ID']][] = $test;
 				}
 
 				$subSectionData = array();

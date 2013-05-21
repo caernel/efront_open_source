@@ -13,7 +13,13 @@ if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
 		$skills_sorted[$skill['categories_ID']][] = $skill;
 		$skill_categories[$skill['categories_ID']] = $skill['category_description'];
 	}
-
+	try {
+		$avatar = new EfrontFile($editedUser -> user['avatar']);
+	} catch (Exception $e) {
+		$avatar = new EfrontFile(G_SYSTEMAVATARSPATH."unknown_small.png");
+	}
+	$smarty -> assign("T_AVATAR", $avatar['url_path']);
+	
 	$smarty -> assign("T_EMPLOYEE_SKILLS", $skills_sorted);
 	$smarty -> assign("T_EMPLOYEE_SKILL_CATEGORIES", $skill_categories);
 	$smarty -> assign('T_EVALUATIONS', 	   $evaluations = $editedEmployee -> getEvaluations());

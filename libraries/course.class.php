@@ -64,7 +64,7 @@ class EfrontCourse
 	 * @var array
 	 * @access public
 	 */
-	public static $course = array();
+	public $course = array();
 
 	/**
 	 * The course users
@@ -1037,9 +1037,9 @@ class EfrontCourse
 
 		!empty($constraints) OR $constraints = array('archive' => false, 'active' => true);
 		list($where, $limit, $orderby) = EfrontUser :: convertUserConstraintsToSqlParameters($constraints);
-		$where[] = "user_type != 'administrator'";
-		$select = "u.*, r.courses_ID is not null as has_course, r.completed,r.score, r.from_timestamp as active_in_course, r.to_timestamp as timestamp_completed, r.role";
-		$from = "users u left outer join (select completed,score,courses_ID,from_timestamp, to_timestamp,users_LOGIN,user_type as role from users_to_courses where courses_ID='".$this -> course['id']."' and archive=0) r on u.login=r.users_LOGIN";
+		$where[] = "u.user_type != 'administrator'";
+		$select = "u.*, uc.courses_ID is not null as has_course, uc.completed,uc.score, uc.from_timestamp as active_in_course, uc.to_timestamp as timestamp_completed, uc.user_type as role";
+		$from = "users u left outer join users_to_courses uc on (uc.users_LOGIN=u.login and courses_ID='".$this -> course['id']."' and uc.archive=0)";
 		if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
 			if (isset($constraints['branch']) && $constraints['branch'] && $constraints['branch'] != "all") {
 				$from .= " JOIN module_hcd_employee_works_at_branch ON module_hcd_employee_works_at_branch.users_login = u.login";
@@ -1080,9 +1080,9 @@ class EfrontCourse
 			}
 		} #cpp#endif
 		list($where, $limit, $orderby) = EfrontUser :: convertUserConstraintsToSqlParameters($constraints);
-		$where[] = "user_type != 'administrator'";
+		$where[] = "u.user_type != 'administrator'";
 		$select = "u.login";
-		$from = "users u left outer join (select distinct completed,score,courses_ID,from_timestamp,users_LOGIN from users_to_courses where courses_ID='".$this -> course['id']."' and archive=0) r on u.login=r.users_LOGIN";
+		$from = "users u left outer join users_to_courses uc on (uc.users_LOGIN=u.login and courses_ID='".$this -> course['id']."' and uc.archive=0)";
 		if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
 			$from .= implode("", $inner_select);
 		} #cpp#endif
@@ -1328,13 +1328,14 @@ class EfrontCourse
 	 * @access public
 	 * @todo deprecated
 	 */
-	public function addUsers($users, $userRoles = 'student', $confirmed = true) {
+	public function addUsers($users, $userRoles = 'student', $confirmed = true) {		
 		if ($this -> course['supervisor_LOGIN']) {
 			$confirmed = false;
 		}
 
 		$roles	      = EfrontUser :: getRoles();
 		$users 		  = EfrontUser::verifyUsersList($users);
+		
 		$userRoles	  = EfrontUser::verifyRolesList($userRoles, sizeof($users));
 		foreach ($userRoles as $key => $value) {
 			if (!EfrontUser::isStudentRole($value) && !EfrontUser::isProfessorRole($value)) {
@@ -1345,7 +1346,13 @@ class EfrontCourse
 			return false;
 		}
 
-		$result 	 = eF_getTableData("users_to_courses uc, users u", "uc.users_LOGIN, uc.archive, uc.user_type, uc.to_timestamp, u.archive as user_archive, uc.completed", "u.login=uc.users_LOGIN and uc.courses_ID=".$this->course['id']);
+		//For a single user, don't retrieve the full list of course users; that can be indefinitely big
+		if (sizeof($users) == 1) {
+			$result 	 = eF_getTableData("users_to_courses uc, users u", "uc.users_LOGIN, uc.archive, uc.user_type, uc.to_timestamp, u.archive as user_archive, uc.completed", "u.login = '{$users[0]}' and u.login=uc.users_LOGIN and uc.courses_ID=".$this->course['id']);				
+		} else {
+			$result 	 = eF_getTableData("users_to_courses uc, users u", "uc.users_LOGIN, uc.archive, uc.user_type, uc.to_timestamp, u.archive as user_archive, uc.completed", "u.login=uc.users_LOGIN and uc.courses_ID=".$this->course['id']);				
+		}
+		
 		$courseUsers = array();
 		$courseRoles = $this -> getPossibleCourseRoles();
 		$courseStudents = 0;
@@ -1555,6 +1562,12 @@ class EfrontCourse
 		}
 
 		$this -> users = false;					//Reset users cache
+		
+		$modules = eF_loadAllModules();
+		foreach ($modules as $module) {
+			$module -> onRemoveUsersFromCourse($this -> course['id'], $users);
+		}		
+		
 		return $this -> getUsers();
 	}
 
@@ -2633,7 +2646,14 @@ class EfrontCourse
 			$courseString .= '<span class = "courseRole">&nbsp;('.$roleNames[$this -> course['user_type']].')</span>';
 		}
 
-		if ($this -> course['start_date'] > time()) {
+		if ($this->course['module_restriction_message']) {
+			$courseString .= '<span style = "vertical-align:middle">&nbsp;('.$this->course['module_restriction_message'].')</span>';
+			if ($roleBasicType == 'student') {
+				foreach ($eligible as $lessonId => $value) {
+					$eligible[$lessonId] -> eligible = false;
+				}
+			}				
+		} else if ($this -> course['start_date'] > time()) {
 			$courseString .= '<span style = "vertical-align:middle">&nbsp;('._COURSESTARTSAT.' '.formatTimestamp($this -> course['start_date'], 'time_nosec').')</span>';
 			if ($roleBasicType == 'student') {			
 				foreach ($eligible as $lessonId => $value) {
@@ -2652,7 +2672,7 @@ class EfrontCourse
 			}
 		}
 		
-		if (!$meets_depends_on_criteria && $this->course['depends_on']) {
+		if (!$meets_depends_on_criteria && $this->course['depends_on'] && $roleBasicType == 'student') {
 			foreach ($eligible as $lessonId => $value) {
 				$eligible[$lessonId] -> eligible = false;
 			}
@@ -3617,7 +3637,7 @@ class EfrontCourse
 		return $from;
 	}
 
-	public function convertCourseConstraintsToRequiredFields($constraints, $select) {
+	public static function convertCourseConstraintsToRequiredFields($constraints, $select) {
 		foreach ($select as $key => $value) {
 			if ((!isset($constraints['required_fields']) || !in_array($key, $constraints['required_fields'])) && $key != 'main') {
 				unset($select[$key]);
@@ -3667,8 +3687,10 @@ class EfrontCourse
 		if (isset($constraints['condition'])) {
 			$where[] = $constraints['condition'];
 		}
-		foreach ($constraints['table_filters'] as $constraint) {
-			$where[] = $constraint['condition'];
+		if (isset($constraints['table_filters'])) {
+			foreach ($constraints['table_filters'] as $constraint) {
+				$where[] = $constraint['condition'];
+			}
 		}
 		if (isset($constraints['branch_url']) && defined('G_BRANCH_URL')) {
 			$tree = new EfrontBranchesTree();
@@ -4131,13 +4153,15 @@ class EfrontCourse
 				}
 			} catch (Exception $e) {}
 		}
-		$completedLessons = array();
+		$completedLessons = array();		
 		foreach ($courseLessons as $key => $value) {	
 			
 			!isset($value['start_date']) OR $dates[$key]['from_timestamp'] = $value['start_date'];
 			!isset($value['end_date'])   OR $dates[$key]['to_timestamp']   = $value['end_date'];
-			if (isset($value['start_period']) && isset($value['end_period']) && $this -> course['start_date'] != 0) {
-				$dates[$key]['from_timestamp'] 	= $this -> course['start_date'] + 24 * 60 * 60 * $value['start_period'];
+			if (isset($value['start_period']) && isset($value['end_period'])) {
+				//$dates[$key]['from_timestamp'] 	= $this -> course['start_date'] + 24 * 60 * 60 * $value['start_period'];
+				//$dates[$key]['to_timestamp'] 	= $dates[$key]['from_timestamp'] + 24 * 60 * 60 * $value['end_period'];
+				$dates[$key]['from_timestamp'] 	= $value['active_in_lesson'] + 24 * 60 * 60 * $value['start_period'];
 				$dates[$key]['to_timestamp'] 	= $dates[$key]['from_timestamp'] + 24 * 60 * 60 * $value['end_period'];
 			} elseif (isset($value['start_date']) && isset($value['end_date']) ) {
 				$dates[$key]['from_timestamp'] = $value['start_date'];

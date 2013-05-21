@@ -163,8 +163,14 @@ try {
 
 
         if (isset($_GET['print'])) {
-            $printTest = $showTest;
-            $printTest -> options['onebyone'] = 0;
+        	$printTest = $showTest;
+        	if (isset($_GET['show_all'])) {
+        		$printTest -> options['random_pool'] = false;
+        	}
+        	if (isset($_GET['preview_correct']) && $_SESSION['s_lesson_user_type'] != 'student') {
+        		$printTest -> preview_correct = true;
+        	}
+        	$printTest -> options['onebyone'] = 0;
 
             $testString = $printTest -> toHTML($printTest -> toHTMLQuickForm(new HTML_QuickForm(), false, false, false, true), false, true);//This way, even 1-1 tests are printed in a single page
         } else {

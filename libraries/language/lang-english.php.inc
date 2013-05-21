@@ -4295,4 +4295,7 @@ define("_FILTERBYOBJECT","Filter by object");
 define("_SELECTOBJECTFROMLIST", "Select an object from the list below");
 define("_SELECTVERBFROMLIST", "Select a verb from the list below");
 define("_GOTO", "Go to");
+define("_USERSTOLESSONS", "Users to lessons");
+define("_NEWLESSONASSIGNMENT", "New lesson assignment");
+define("_COULDNOTFINDLESSON", "Could not find lesson");
 ?>

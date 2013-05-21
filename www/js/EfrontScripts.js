@@ -15,9 +15,9 @@ function findFrame(win, frame_name) {
 
 function eF_js_showDivPopup(e, popup_title, size, popup_data_id) {
 	var sizes = [new Array('600px', '400px'), new Array('680px', '450px'), new Array('760px', '580px'), new Array('800px', '630px'), new Array('940px', '650px')];
-	//console.log(e.target);
+	var target = e.target || e.srcElement;
 	if (popup_title) {
-		jQuery.fn.efront('modal', {'header':popup_title, 'id':popup_data_id, width:sizes[size][0], height:sizes[size][1], 'element' :e.target});
+		jQuery.fn.efront('modal', {'header':popup_title, 'id':popup_data_id, width:sizes[size][0], height:sizes[size][1], 'element' :target});
 	} else {
 		jQuery('#ef-modal').modal('hide').remove();
 	}
@@ -462,7 +462,7 @@ function onGetBookmarks(el, response) {
 		} else {
 			bookmarks.insert(new Element('div').update(NODATAFOUND).addClassName('emptyCategory'));
 		}
-	    eF_js_showDivPopup(BOOKMARKTRANSLATION, 1, 'bookmarks_div_code');
+	    eF_js_showDivPopup(event, BOOKMARKTRANSLATION, 1, 'bookmarks_div_code');
 	}
 }
 function addBookmark(el) {

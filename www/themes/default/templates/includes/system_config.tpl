@@ -63,11 +63,13 @@
 		{capture name = "external_livedocx"}
 			{eF_template_printForm form=$T_EXTERNAL_LIVEDOCX_FORM}
 		{/capture}
+{if $smarty.const.G_VERSIONTYPE != 'community'} {* #cpp#ifndef COMMUNITY *}
 	{if $smarty.const.G_VERSIONTYPE != 'standard'} {* #cpp#ifndef STANDARD *}
 		{capture name = "external_facebook"}
 			{eF_template_printForm form=$T_EXTERNAL_FACEBOOK_FORM}
 		{/capture}
 	{/if} {* #cpp#endif *}
+{/if} {* #cpp#endif *}
 {if $smarty.const.G_VERSIONTYPE != 'community'} {* #cpp#ifndef COMMUNITY *}
 	{if $smarty.const.G_VERSIONTYPE != 'standard'} {* #cpp#ifndef STANDARD *}
 		{capture name = "external_ldap"}

@@ -703,12 +703,16 @@ if ($_GET['op'] == 'course_info') {
 			$smarty->assign('T_CURRENT_TEMPLATE_TYPE', $currentTemplateType);
 		}
 
-		$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type",
+		if ($_SESSION['s_type'] != 'administrator') {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type",
 						"certificate_type='main' OR id='".$currentCourse->options['certificate_tpl_id']."' OR users_LOGIN='".$GLOBALS['currentUser']->user['login']."'", "certificate_name");
-
-		foreach($templates as $key => $value)
-		$existingCertificates[$value['id'].'-'.$value['certificate_type']] = $value['certificate_name'];
-	
+		} else {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type", "", "certificate_name");					
+		}
+		
+		foreach($templates as $key => $value) {
+			$existingCertificates[$value['id'].'-'.$value['certificate_type']] = $value['certificate_name'];
+		}
 		$form = new HTML_QuickForm("edit_course_certificate_form", "post",
 		basename($_SERVER['PHP_SELF']).'?'.$baseUrl.'&op=format_certificate&switch=1', "", null, true);
 		$form -> registerRule('checkParameter', 'callback', 'eF_checkParameter'); // Register this rule for checking user input with eF_checkParameter
@@ -927,16 +931,21 @@ if ($_GET['op'] == 'course_info') {
 
 	if(G_VERSIONTYPE != 'community'){ #cpp#ifndef COMMUNITY
 
-		if($_GET['op'] == 'add_certificate_template')
-		$postTarget = basename($_SERVER['PHP_SELF']).'?'.$baseUrl.'&op=add_certificate_template';
-
+		if($_GET['op'] == 'add_certificate_template') {
+			$postTarget = basename($_SERVER['PHP_SELF']).'?'.$baseUrl.'&op=add_certificate_template';
+		}
 		else if($_GET['op'] == 'edit_certificate_template'){
 
-			$templates = eF_getTableData("certificate_templates", "id", "users_LOGIN='".$GLOBALS['currentUser']->user['login']."'");
-
-			foreach($templates as $key => $value)
-			$userTemplates[$value['id']] = $value['id'];
-
+			if ($_SESSION['s_type'] != 'administrator') {
+				$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type",
+						"certificate_type='main' OR id='".$currentCourse->options['certificate_tpl_id']."' OR users_LOGIN='".$GLOBALS['currentUser']->user['login']."'", "certificate_name");
+			} else {
+				$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type", "", "certificate_name");
+			}
+				
+			foreach($templates as $key => $value) {
+				$userTemplates[$value['id']] = $value['id'];
+			}
 			if(!in_array($_GET['template_id'], $userTemplates)){
 
 				$message = _CERTIFICATETEMPLATENOACCESS;
@@ -958,12 +967,12 @@ if ($_GET['op'] == 'course_info') {
 		$form->addElement('textarea', 'certificate_xml', _XML, 'style="width:99%; height:333px; font-weight:normal; font-size:11px;"');
 		$form->addElement('submit', 'preview_certificate_template', _PREVIEW, 'class="flatButton"');
 
-		if($_GET['op'] == 'add_certificate_template')
-		$form->addElement('submit', 'submit_certificate_template', _SAVE, 'class="flatButton"');
-
-		else if($_GET['op'] == 'edit_certificate_template')
-		$form->addElement('submit', 'submit_certificate_template', _UPDATE, 'class="flatButton"');
-
+		if($_GET['op'] == 'add_certificate_template') {
+			$form->addElement('submit', 'submit_certificate_template', _SAVE, 'class="flatButton"');
+		}
+		else if($_GET['op'] == 'edit_certificate_template') {
+			$form->addElement('submit', 'submit_certificate_template', _UPDATE, 'class="flatButton"');
+		}
 		if($_GET['op'] == 'add_certificate_template'){
 
 			$mainTemplateXMLFile = new EfrontFile(G_CERTIFICATETEMPLATEPATH."Minimum Decoration (Unicode).xml");
@@ -1093,11 +1102,17 @@ if ($_GET['op'] == 'course_info') {
 
 	if(G_VERSIONTYPE != 'community'){ #cpp#ifndef COMMUNITY
 
-		$templates = eF_getTableData("certificate_templates", "id", "users_LOGIN='".$GLOBALS['currentUser']->user['login']."'");
+		if ($_SESSION['s_type'] != 'administrator') {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type",
+						"certificate_type='main' OR id='".$currentCourse->options['certificate_tpl_id']."' OR users_LOGIN='".$GLOBALS['currentUser']->user['login']."'", "certificate_name");
+		} else {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type", "", "certificate_name");					
+		}
+		
 
-		foreach($templates as $key => $value)
-		$userTemplates[$value['id']] = $value['id'];
-
+		foreach($templates as $key => $value) {
+			$userTemplates[$value['id']] = $value['id'];
+		}
 		if(!in_array($_GET['template_id'], $userTemplates)){
 
 			$message = _CERTIFICATETEMPLATENOACCESS;
@@ -1150,12 +1165,16 @@ if ($_GET['op'] == 'course_info') {
 
 	if(G_VERSIONTYPE != 'community'){ #cpp#ifndef COMMUNITY
 
-		$templates = eF_getTableData("certificate_templates", "id",
-								"certificate_type='main' OR users_LOGIN='".$GLOBALS['currentUser']->user['login']."'");
-
-		foreach($templates as $key => $value)
-		$userTemplates[$value['id']] = $value['id'];
-
+		if ($_SESSION['s_type'] != 'administrator') {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type",
+					"certificate_type='main' OR id='".$currentCourse->options['certificate_tpl_id']."' OR users_LOGIN='".$GLOBALS['currentUser']->user['login']."'", "certificate_name");
+		} else {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type", "", "certificate_name");
+		}
+		
+		foreach($templates as $key => $value) {
+			$userTemplates[$value['id']] = $value['id'];
+		}
 		if(!in_array($_GET['template_id'], $userTemplates)){
 
 			$message = _CERTIFICATETEMPLATENOACCESS;
@@ -1210,11 +1229,16 @@ if ($_GET['op'] == 'course_info') {
 
 	if(G_VERSIONTYPE != 'community'){ #cpp#ifndef COMMUNITY
 
-		$templates = eF_getTableData("certificate_templates", "id", "users_LOGIN='".$GLOBALS['currentUser']->user['login']."'");
-
-		foreach($templates as $key => $value)
-		$userTemplates[$value['id']] = $value['id'];
-
+		if ($_SESSION['s_type'] != 'administrator') {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type",
+						"certificate_type='main' OR id='".$currentCourse->options['certificate_tpl_id']."' OR users_LOGIN='".$GLOBALS['currentUser']->user['login']."'", "certificate_name");
+		} else {
+			$templates = eF_getTableData("certificate_templates", "id, certificate_name, certificate_type", "", "certificate_name");					
+		}
+		
+		foreach($templates as $key => $value) {
+			$userTemplates[$value['id']] = $value['id'];
+		}
 		if(!in_array($_GET['template_id'], $userTemplates)){
 
 			$message = urlencode(_CERTIFICATETEMPLATENOACCESS)."&message_type=failure";
@@ -1437,15 +1461,11 @@ if ($_GET['op'] == 'course_info') {
 		handleAjaxExceptions($e);
 	}
 	$days_after_enrollment = array();
-	for ($k = 1; $k <= 360; $k++) {
+	for ($k = 0; $k <= 360; $k++) {
 		$days_after_enrollment[$k] = $k;		
-		if ($k >= 120) {
-			$k+=29;
-	    } elseif ($k >= 60) {
-			$k+=14;
-		} elseif ($k >= 20){
-			$k+=4;
-		}
+		if ($k >= 100) {
+			$k+=5;
+	    } 
 	}
 	$smarty -> assign("T_DAYS_AFTER_ENROLLMENT", $days_after_enrollment);
 	$smarty -> assign("T_COURSE_LESSONS", EfrontCourse::convertLessonObjectsToArrays($courseLessons));

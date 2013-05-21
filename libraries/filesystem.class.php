@@ -615,7 +615,7 @@ class EfrontFile extends ArrayObject
                 if (defined("NO_CHECK_FILE_INTEGRITY") && NO_CHECK_FILE_INTEGRITY) {
                 	$blackList = $whiteList = '';
                 }
-                $response = exec('unzip -qq "'.$this['path'].'" '.$whiteList.' '.$blackList.' -d "'.$this['directory'].'" 2>&1', $output, $code);
+                $response = exec('unzip -qqο "'.$this['path'].'" '.$whiteList.' '.$blackList.' -d "'.$this['directory'].'" 2>&1', $output, $code);
 
                 if (stripos($response, 'caution') === false && stripos($response, 'warning') === false && $code != 0) {
                     throw new EfrontFileException(_COMMANDFAILEDWITHOUTPUT.': '.$response.". "._PERHAPSDONTSUPPORTZIP, EfrontFileException :: ERROR_ZIP_PROCESSING);

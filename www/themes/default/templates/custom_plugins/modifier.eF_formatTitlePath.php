@@ -22,7 +22,6 @@
  */
 function smarty_modifier_eF_formatTitlePath($string, $length = 80, $pathLimit = 6, $etc = '...')
 {
-	//vd($string);
 	$piecesStart 		= explode("&raquo;&nbsp;", $string); 	// with tags
 	$stripped			= strip_tags($string);					//remove tags to count characters
 	$piecesStripped 	= explode("&raquo;&nbsp;", $stripped);

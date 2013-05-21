@@ -263,6 +263,7 @@ function on_off() {
 		for (x in chatBoxes) { // close all open chatboxes
 			if (chatBoxes.hasOwnProperty(x)){
 				//if ($J("#chatbox_"+chatBoxes[x]).css('display') != 'none') {
+
 				if ($J("#chatbox_"+chatBoxes[x].replace(/\./g,"\\.").replace(/\@/g,"\\@")).is(":visible")){
 					closeChatBox(chatBoxes[x]);
 				}
@@ -360,7 +361,6 @@ function createChatBox(chatboxtitle, chatboxname, minimizeChatBox, minimizeOther
 	var chatBoxeslength = 0;
 	
 	if ($J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")).length > 0) { //if chatbox was already opened before
-		
 		if (minimizeOthers == 1){
 			for (x in chatBoxes) { // minimize all other open chatboxes
 				if (chatBoxes.hasOwnProperty(x) && chatboxtitle != chatBoxes[x]){
@@ -407,9 +407,9 @@ function createChatBox(chatboxtitle, chatboxname, minimizeChatBox, minimizeOther
 	.addClass("chatbox")
 	.html('<div class="chatboxhead" onclick="javascript:toggleChatBoxGrowth(\''+chatboxtitle+'\')"><div class="chatboxtitle">'+chatboxname.substring(0,30)+'</div><div class="chatboxoptions"><a href="javascript:void(0)" onclick="javascript:closeChatBox(\''+chatboxtitle+'\')"><img src="'+ modulechatbaselink +'img/x.png" /></a></div><br clear="all"/></div><div class="chatboxcontent"></div><div class="chatboxinput"><textarea class="chatboxtextarea" onKeyUp="javascript: return checkChatBoxInputKey(event,this,\''+chatboxtitle+'\',\''+chatboxname.substring(0,30)+'\');"></textarea></div>')
 	.prependTo($J( "#windows" ));
-	 
+
 	$J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")).css('bottom', '0px');
-	
+
 	chatBoxeslength = 0;
 
 	if (minimizeOthers == 1){
@@ -479,12 +479,12 @@ function createChatBox(chatboxtitle, chatboxname, minimizeChatBox, minimizeOther
 	});
 	
 	$J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")+ " .chatboxcontent").click(function(){
-												if (!($J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")+" .chatboxtextarea").is(":focus")))
-													$J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")+" .chatboxtextarea").focus();
-												blink_win[chatboxtitle] = false;
-												$J('#chatbox_'+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")+' .chatboxhead').removeClass('chatboxblink');
-												});
-
+		if (!($J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")+" .chatboxtextarea").is(":focus")))
+				$J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")+" .chatboxtextarea").focus();
+			blink_win[chatboxtitle] = false;
+			$J('#chatbox_'+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")+' .chatboxhead').removeClass('chatboxblink');
+	});
+	
 
 	$J("#chatbox_"+chatboxtitle.replace(/\./g,"\\.").replace(/\@/g,"\\@")).show();
 }
@@ -798,8 +798,10 @@ function startChatSession(){
 			});
 			
 			if ($J.cookie("openchatbox")){
+				//try{ alert($J.cookie("openchatbox"));
 				$J("#chatbox_"+$J.cookie("openchatbox")+" .chatboxcontent").show();
 				$J("#chatbox_"+$J.cookie("openchatbox")+" .chatboxinput").show();
+				//}catch(err){ 		alert(err.message); 	}
 			}
 			for (i=0;i<chatBoxes.length;i++) {
 					chatboxtitle = chatBoxes[i];

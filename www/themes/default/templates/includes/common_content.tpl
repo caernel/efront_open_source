@@ -332,6 +332,16 @@
 							<a href = "{$smarty.server.PHP_SELF}?ctg={if $T_UNIT.ctg_type == 'tests'}tests{elseif $T_UNIT.ctg_type == 'feedback'}feedback{else}content{/if}&edit={if $smarty.get.view_unit !=""}{$smarty.get.view_unit}{else}{$T_CURRENTUNITID}{/if}" title = "{$smarty.const._UPDATEUNIT}">{$smarty.const._UPDATEUNIT}</a>
 						</span>
 						{/if}
+						{if $T_UNIT.ctg_type == 'tests'}
+						<span>
+							<img src = "images/16x16/search.png" title = "{$smarty.const._VIEWALL}" alt = "{$smarty.const._VIEWALL}"/>
+							<a href = "{$smarty.server.PHP_SELF}?view_unit={$smarty.get.view_unit}&show_all=1" title = "{$smarty.const._VIEWALL}">{$smarty.const._VIEWALL}</a>
+						</span>
+						<span>
+							<img src = "images/16x16/success.png" title = "{$smarty.const._SHOWRIGHTANSWERS}" alt = "{$smarty.const._SHOWRIGHTANSWERS}"/>
+							<a href = "{$smarty.server.PHP_SELF}?view_unit={$smarty.get.view_unit}&show_all=1&preview_correct=1" title = "{$smarty.const._SHOWRIGHTANSWERS}">{$smarty.const._SHOWRIGHTANSWERS}</a>
+						</span>
+						{/if}
 					{/if}
 					</div>
 				{/if}
@@ -417,11 +427,11 @@
 		{/capture}
 
 		{capture name = 't_unit_operations'}
-			{if $T_CURRENT_LESSON->options.print_content && !$T_SCORM}
+			{if ($T_CURRENT_LESSON->options.print_content || $_professor_) && !$T_SCORM}
 				{if $T_UNIT.ctg_type != 'tests'}
 					<div>{counter name = "unit_operations"}. <a href = "{$smarty.server.PHP_SELF}?ctg=content&view_unit={$T_UNIT.id}&popup=1&print=1", onclick = "eF_js_showDivPopup(event, '{$smarty.const._PRINTERFRIENDLY}', 2)" target = "POPUP_FRAME">{$smarty.const._PRINTERFRIENDLY}</a></div>
 				{else}
-					<div>{counter name = "unit_operations"}. <a href = "{$smarty.server.PHP_SELF}?ctg=tests&show_test={$T_UNIT_TEST_ID}&popup=1&print=1", onclick = "eF_js_showDivPopup(event, '{$smarty.const._PRINTERFRIENDLY}', 2)" target = "POPUP_FRAME">{$smarty.const._PRINTERFRIENDLY}</a></div>
+					<div>{counter name = "unit_operations"}. <a href = "{$smarty.server.PHP_SELF}?ctg=tests&show_test={$T_UNIT_TEST_ID}&popup=1&print=1{if $smarty.get.show_all}&show_all=1{/if}{if $smarty.get.preview_correct}&preview_correct=1{/if}", onclick = "eF_js_showDivPopup(event, '{$smarty.const._PRINTERFRIENDLY}', 2)" target = "POPUP_FRAME">{$smarty.const._PRINTERFRIENDLY}</a></div>
 				{/if}
 			{/if}
 			{if 'comments'|eF_template_isOptionVisible && $_change_ && !$T_RULE_CHECK_FAILED}

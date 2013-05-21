@@ -234,7 +234,7 @@ class EfrontPdf
 
 	public function printSectionTitle($title) {
 		$this->pdf->setTextColor(0,0,0);
-		$this->pdf->Ln(12);
+		$this->pdf->Ln(6);
 		$this->printMediumTitle($title);
 		$this->pdf->Ln(2);
 	}

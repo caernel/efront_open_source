@@ -99,6 +99,14 @@
             {capture name = "test_footer"}
             <table class = "formElements" style = "width:100%">
                 <tr><td colspan = "2">&nbsp;</td></tr>
+                {if $T_TEST_DATA->options.onebyone}
+                	<tr><td colspan = "2">&nbsp;</td></tr>
+                	<tr><td colspan = "2">&nbsp;</td></tr>
+                 	<tr><td colspan = "2">&nbsp;</td></tr>
+                  	<tr><td colspan = "2">&nbsp;</td></tr>
+                   	<tr><td colspan = "2">&nbsp;</td></tr>
+                    <tr><td colspan = "2">&nbsp;</td></tr>
+                {/if}
                 <tr><td colspan = "2" class = "submitCell" style = "text-align:center">{$T_TEST_FORM.submit_test.html}&nbsp;{$T_TEST_FORM.pause_test.html}</td></tr>
             </table>
             {/capture}

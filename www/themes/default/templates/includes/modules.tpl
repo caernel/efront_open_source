@@ -40,6 +40,7 @@
                                 	<span style = "display:none">-1</span>
                                         <img src = "images/16x16/close.png" alt = "{$T_MODULES[modules_list].errors}" title = "{$T_MODULES[modules_list].errors}">
                                 {/if}
+                               
                                     </td>
                                     <td class = "centerAlign">
                                 {if !$T_MODULES[modules_list].not_installed}
@@ -64,9 +65,9 @@
                                     {if $change_modules}
                                     	<img class = "ajaxHandle" src = "images/16x16/add.png" title="{$smarty.const._INSTALLMODULE}" alt="{$smarty.const._INSTALLMODULE}" onclick = "installModule(this, '{$T_MODULES[modules_list].className}')"/>
                                     	<img class = "ajaxHandle" src = "images/16x16/error_delete.png" title = "{$smarty.const._DELETE}" alt = "{$smarty.const._DELETE}" onclick = "if (confirm ('{$smarty.const._IRREVERSIBLEACTIONAREYOUSURE}')) deleteModule(this, '{$T_MODULES[modules_list].className}')"/>
-                                    
 									{/if}
                                 {/if}
+                                	<img class = "ajaxHandle" src = "images/16x16/export.png" title = "{$smarty.const._EXPORT}" alt = "{$smarty.const._EXPORT}" onclick = "exportModule(this, '{$T_MODULES[modules_list].className}')">
                                     </td>
                                 </tr>
                             {sectionelse}

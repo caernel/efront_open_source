@@ -69,11 +69,9 @@
 						<td class = "elementCell">{$T_COURSE_FORM.max_users.html}</td></tr>
 					<tr><td class = "labelCell">{$T_COURSE_FORM.training_hours.label}:&nbsp;</td>
 						<td class = "elementCell">{$T_COURSE_FORM.training_hours.html}</td></tr>
-				{/if} {* #cpp#endif *}
 					<tr><td class = "labelCell">{$T_COURSE_FORM.ceu.label}:&nbsp;</td>
 						<td class = "elementCell">{$T_COURSE_FORM.ceu.html}</td></tr>
-{*			        <tr><td class = "labelCell">{$smarty.const._STARTDATE}:&nbsp;</td>
-			            <td class = "elementCell">{eF_template_html_select_date prefix="date_" time=$T_START_DATE start_year="+0" end_year="+5" field_order = $T_DATE_FORMATGENERAL}</td></tr>*}
+				{/if} {* #cpp#endif *}
 			 {/if} {* #cpp#endif *}
 					<tr><td></td>
 						<td class = "submitCell">{$T_COURSE_FORM.submit_course.html}</td></tr>

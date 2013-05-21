@@ -13,9 +13,9 @@ if (isset($currentUser->coreAccess['organization']) && $currentUser->coreAccess[
 } else if ($currentUser -> user['login'] == $editedUser -> user['login']) {
 	$_change_skills_ = false;
 #cpp#ifdef ENTERPRISE	
-} else if (!$currentEmployee -> isSupervisor()) {
+} else if (G_VERSIONTYPE == 'enterprise' && !$currentEmployee -> isSupervisor()) {
 	$_change_skills_ = false;
-} else if ($currentEmployee -> supervisesEmployee($editedUser->user['login'])) {
+} else if (G_VERSIONTYPE == 'enterprise' && $currentEmployee -> supervisesEmployee($editedUser->user['login'])) {
 	$_change_skills_ = true;
 #cpp#endif	
 } else {

@@ -11,7 +11,8 @@
 				'header': 'Header',
 				'id': false,
 				'remote': false,
-				'element' : null
+				'element' : null,
+				'url': null
 		    }, options);
 
 				
@@ -40,16 +41,23 @@
 				
 		} else if (settings.remote === false) {
 			$('.modal-body').css({'height':'100%', 'max-height':(parseInt(settings.height)-50)+'px'});
-			if ($(settings.element).is('a')) {
-				var el = $(settings.element);					//If it's a link, then use its href attribute
+			if (settings.url == null) {
+				if ($(settings.element).is('a')) {
+					var el = $(settings.element);					//If it's a link, then use its href attribute
+				} else {
+					var el = $(settings.element).parents('a');		//Otherwise, use its parent element, assuming that it's (for example) an img within a link
+				}			
+				if (el.length == 0) {
+					var el = $(settings.element).children('a');		//Otherwise, use its child element, assuming we clicked on a td that contains a link (like when in icon blocks)
+				}
+				if (el.length != 0) {
+					var href = el.attr('href');
+				}
 			} else {
-				var el = $(settings.element).parents('a');		//Otherwise, use its parent element, assuming that it's (for example) an img within a link
-			}			
-			if (el.length == 0) {
-				var el = $(settings.element).children('a');		//Otherwise, use its child element, assuming we clicked on a td that contains a link (like when in icon blocks)
+				var href = settings.url;
 			}
-			
-			$('<iframe src = "'+el.attr('href')+'" frameborder="no"></iframe>')
+			console.log(href);
+			$('<iframe src = "'+href+'" frameborder="no"></iframe>')
 			.css({'width':$('#ef-modal').children('.modal-body').width(),'height':$('#ef-modal').children('.modal-body').height()-30})
 			.appendTo('.modal-body');
 			$('#ef-modal').on('hidden', function () {

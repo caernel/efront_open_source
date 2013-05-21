@@ -147,6 +147,7 @@ class EfrontConfiguration
         'multiple_logins'		 => '',
         'mapped_accounts'		 => '0',		//0: Enabled, 1: disabled for students, 2: disabled for students and professors, 3: disabled for all
         
+        'mod_rewrite_bypass'	 => '0',
         //Simple mode
         'simple_mode' => '0',
         
@@ -199,7 +200,7 @@ class EfrontConfiguration
         'mode_allow_users_to_delete_supervisor_files' => self::MODE_VISIBLE,
         'mode_propagate_courses_to_branch_users' => self::MODE_VISIBLE,
         //'mode_allow_direct_login' => self::MODE_VISIBLE,
-        'mode_mod_rewrite_bypass' => self::MODE_INVISIBLE,
+ 
         
         'mode_social_events' => self::MODE_INVISIBLE,
         'mode_system_timeline' => self::MODE_INVISIBLE,

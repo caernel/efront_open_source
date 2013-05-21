@@ -9,6 +9,7 @@ require_once $path."configuration.php";
 
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+header("Content-type:application/javascript");
 
 /*These lines read SCO data for this student and pass them to the javascript code through the LMSToSCOValues variable*/
 if (eF_checkParameter($_GET['view_unit'], 'id')) {
@@ -1084,7 +1085,7 @@ Uncomment this and comment below to make it non-implemented
             }
 
             /**
-            * cmi.core.score.is the user's minimum possible score
+            * cmi.core.score.min is the user's minimum possible score
             *
             * Supported API calls: LMSGetValue(), LMSSetValue()
             * LMS Mandatory:

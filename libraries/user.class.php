@@ -250,6 +250,7 @@ abstract class EfrontUser
 	 * @access public
 	 */
 	public static function createUser($userProperties, $users = array(), $addToDefaultGroup = true) {
+/*		
 		if (empty($users)) {
 			$users = eF_getTableDataFlat("users", "login, active, archive");
 		}	
@@ -266,15 +267,25 @@ abstract class EfrontUser
 		
 		//$archived = array_filter($archived, create_function('$v', 'return $v;'));
 		$users = array_combine($users['login'], $users['active']);	
-		$activatedUsers = array_sum($users); //not taking into account deactivated users in license users count
-
-		//$versionDetails = eF_checkVersionKey($GLOBALS['configuration']['version_key']);
-
+*/		
+		//$activatedUsers = array_sum($users); //not taking into account deactivated users in license users count		
+		$result = eF_getTableData("users", "count(id) as total");
+		$activatedUsers = $result[0]['total'];
+		
 		if (!isset($userProperties['login']) || !eF_checkParameter($userProperties['login'], 'login')) {
 			throw new EfrontUserException(_INVALIDLOGIN.': '.$userProperties['login'], EfrontUserException :: INVALID_LOGIN);
 		}
 		
-
+		$result = eF_getTableData("users", "login, archive", "login='{$userProperties['login']}'");	//collation is by default utf8_general_ci, meaning that this search is case-insensitive
+		if (sizeof($result) > 0) {
+			if ($result[0]['archive']) {
+				throw new EfrontUserException(_USERALREADYEXISTSARCHIVED.': '.$userProperties['login'], EfrontUserException :: USER_EXISTS);
+			} else {
+				throw new EfrontUserException(_USERALREADYEXISTS.': '.$userProperties['login'], EfrontUserException :: USER_EXISTS);
+			}
+		}
+		
+/*		
 		$archived_keys = array_combine(array_keys($archived),array_keys($archived));  
 		if (isset($archived_keys[mb_strtolower($userProperties['login'])])) {
 		//if (in_array(mb_strtolower($userProperties['login']), array_keys($archived), true) !== false) {	
@@ -286,7 +297,7 @@ abstract class EfrontUser
 		//if (in_array(mb_strtolower($userProperties['login']), array_keys($users), true) !== false) {
 			throw new EfrontUserException(_USERALREADYEXISTS.': '.$userProperties['login'], EfrontUserException :: USER_EXISTS);
 		}
-
+*/
 		
 		if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
 			if (G_VERSIONTYPE != 'standard') { #cpp#ifndef STANDARD
@@ -300,7 +311,6 @@ abstract class EfrontUser
 		if ($userProperties['email'] && !eF_checkParameter($userProperties['email'], 'email')) {
 			throw new EfrontUserException(_INVALIDEMAIL.': '.$userProperties['email'], EfrontUserException :: INVALID_PARAMETER);
 		}
-
 		if (!isset($userProperties['name'])) {
 			throw new EfrontUserException(_INVALIDNAME.': '.$userProperties['name'], EfrontUserException :: INVALID_PARAMETER);
 		}
@@ -518,10 +528,10 @@ abstract class EfrontUser
 		if (!$user -> isLoggedIn(session_id())) {
 			throw new EfrontUserException(_RESOURCEREQUESTEDREQUIRESLOGIN, EfrontUserException::USER_NOT_LOGGED_IN);
 		}
-
 		if ($user -> user['timezone']) {
 			date_default_timezone_set($user -> user['timezone']);
 		}
+		
 		$user -> applyRoleOptions($user -> user['user_types_ID']);                //Initialize user's role options for this lesson
 		if ($type && $user -> user['user_type'] != $type) {
 			throw new Exception(_YOUCANNOTACCESSTHISPAGE, EfrontUserException::INVALID_TYPE);
@@ -1155,7 +1165,7 @@ abstract class EfrontUser
 					$usersOnline[] = array('login' 		   => $value['login'],
 										   //'name'		   => $value['name'],
 										   //'surname'	   => $value['surname'],
-										   'formattedLogin'=> formatLogin(false, $value),
+										   'formattedLogin'=> formatLogin($value['login'], $value),
 										   'user_type'	 	   => $value['user_type'],
 										   'timestamp_now' 	   => $value['timestamp_now'],
 										   'session_timestamp' => $value['session_timestamp'],
@@ -1853,7 +1863,7 @@ abstract class EfrontUser
 		}
 		//$simpleMode = !$GLOBALS['configuration']['simple_mode'] || $GLOBALS['configuration']['mode_'.$option] == 1;	//either we're not in simple mode, or this option is allowed in simple mode		
 		if (isset($_SESSION['s_login']) && isset($GLOBALS['currentUser']) && ($GLOBALS['currentUser'] instanceOf EfrontUser)) {
-			$simpleMode = !$GLOBALS['currentUser']->user['simple_mode'] || $GLOBALS['configuration']['mode_'.$option] == 1;	//either we're not in simple mode, or this option is allowed in simple mode
+			$simpleMode = !$GLOBALS['currentUser']->user['simple_mode'] || !isset($GLOBALS['configuration']['mode_'.$option]) || $GLOBALS['configuration']['mode_'.$option] == 1;	//either we're not in simple mode, or this option is allowed in simple mode
 		}
 		if ($_SESSION['s_type'] == 'student') { //student is considered as in complete mode
 			$simpleMode = true;
@@ -1869,7 +1879,6 @@ abstract class EfrontUser
 		} else {
 			$lessonMode = true;
 		}	
-		
 		$mode = $simpleMode && $disableMode && $coreAccessMode && $lessonMode;
 		return $mode;
 	}
@@ -3846,7 +3855,7 @@ class EfrontStudent extends EfrontLessonUser
 			}
 			// Trigger all necessary events. If the function has not been re-defined in the derived module class, nothing will happen
 			foreach (self::$cached_modules as $module) {
-				$module -> onCompleteCourse($course->course['id'], $userProperties['login']);
+				$module -> onCompleteCourse($course->course['id'], $this->user['login']);
 			}
 						
 			if ($course -> options['auto_certificate']) {
@@ -3958,6 +3967,14 @@ class EfrontStudent extends EfrontLessonUser
 					$completedLesson = true;
 				}
 			}
+			
+			if (!self::$cached_modules) {
+				self::$cached_modules = eF_loadAllModules();
+			}
+			// Trigger all necessary events. If the function has not been re-defined in the derived module class, nothing will happen
+			foreach (self::$cached_modules as $module) {
+				$module -> onCompleteUnit($unit, $this->user['login']);
+			}				
 
 		}
 		return $completedLesson;

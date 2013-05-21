@@ -75,7 +75,8 @@ abstract class EfrontImport
 		if (!self::$datatypes) {
 			self::$datatypes = array("anything"		  => _IMPORTANYTHING,
 							   "users" 			  => _USERS,
-							   "users_to_courses" => _USERSTOCOURSES);
+							   "users_to_courses" => _USERSTOCOURSES,
+								"users_to_lessons" => _USERSTOLESSONS);
 
 			if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
 				self::$datatypes["users_to_groups"] = _USERSTOGROUPS;
@@ -126,6 +127,21 @@ abstract class EfrontImport
 		return $this -> courseNamesToIds[$courses_name];
 	}
 
+	protected $lessonNamesToIds = false;
+	protected function getLessonByName($lessons_name) {
+		if (!$this -> lessonNamesToIds) {
+			$lessons = eF_getTableData("lessons", "id,name", "archive=0");			
+			foreach($lessons as $lesson) {
+				if (!isset($this -> lessonNamesToIds[mb_strtolower($lesson['name'])])) {
+					$this -> lessonNamesToIds[mb_strtolower($lesson['name'])] = array($lesson['id']);
+				} else {
+					$this -> lessonNamesToIds[mb_strtolower($lesson['name'])][] = $lesson['id'];
+				}
+			}
+		}
+		return $this -> lessonNamesToIds[mb_strtolower($lessons_name)];
+	}
+	
 	private $groupNamesToIds = false;
 	protected function getGroupByName($group_name) {
 		if (!$this -> groupNamesToIds) {
@@ -382,7 +398,17 @@ abstract class EfrontImport
 						   "course_score"		=> "score",
 						   "course_active"		=> "active",
 						   "course_end_date"	=> "to_timestamp");
-
+			case "users_to_lessons":
+				return array("users_login"		=> "users_login",
+				"lessons_name"		=> "lesson_name",
+				"lesson_user_type"	=> "user_type",
+				"lesson_completed"	=> "completed",
+				"lesson_comments"	=> "comments",
+				"lesson_score"		=> "score",
+				"lesson_active"		=> "active",
+				"lesson_end_date"	=> "to_timestamp");
+				
+				
 			case "users_to_groups":
 				return array("users_login"	=> "users_login",
 							 "group_name"	=> "groups.name");
@@ -405,6 +431,9 @@ abstract class EfrontImport
 			case "users_to_courses":
 				return array("users_login" => "users_login",
 							 "course_name"=> "courses_name");
+			case "users_to_lessons":
+				return array("users_login" => "users_login",
+							 "lesson_name"=> "lessons_name");
 			case "users_to_groups":
 				return array("users_login" => "users_login",
 							 "groups.name" => "group_name");
@@ -640,6 +669,12 @@ class EfrontImportCsv extends EfrontImport
 
 					$this -> log["success"][] = _LINE . " $line: " . _REPLACEDEXISTINGASSIGNMENT;
 					break;
+				case "users_to_lessons":
+					eF_updateTableData("users_to_lessons", $data, "users_login='".$data['users_login']."' AND lessons_ID = " . $data['lessons_ID']);
+				
+					$this -> log["success"][] = _LINE . " $line: " . _REPLACEDEXISTINGASSIGNMENT;
+					break;
+							
 				case "users_to_groups":
 					break;
 
@@ -1038,6 +1073,72 @@ class EfrontImportCsv extends EfrontImport
 						$this -> log["failure"][] = _LINE . " $line: " . _USERDOESNOTEXIST. ": " . $data['users_login'];
 					}
 					break;
+				case "users_to_lessons":
+					//Check if a user exists and whether it has the same case
+				
+					$userFound = false;
+					if (!in_array($data['users_login'], $this->allUserLogins)) {				//For case-insensitive matches
+				
+						foreach ($this->allUserLogins as $login) {
+							if (mb_strtolower($data['users_login']) == mb_strtolower($login)) {
+								$data['users_login'] = $login;
+								$userFound = true;
+							}
+						}
+					} else {
+						$userFound = true;
+					}
+				
+					if ($userFound) {
+						$lessons_name = trim($data['lesson_name']);
+						$lessons_ID = $this -> getLessonByName($lessons_name);
+						unset($data['lesson_name']);
+						if ($lessons_ID) {
+				
+							foreach($lessons_ID as $lesson_ID) {
+								$data['lessons_ID'] = $lesson_ID;
+								$lesson = new EfrontLesson($lesson_ID);
+				
+								if (!$lesson->lesson['course_only']) {
+									$lesson -> addUsers($data['users_login'], (isset($data['user_type'])?$data['user_type']:"student"));
+								}
+								$data['completed'] ? $data['completed'] = 1 : $data['completed'] = 0;
+								eF_updateTableData("users_to_lessons", $data, "users_login = '" .$data['users_login']. "' AND lessons_ID = " . $data['lessons_ID']);
+								
+								if (!$lesson->lesson['course_only']) {
+									if ($data['active']) {
+										$lesson -> confirm($data['users_login']);
+									} else {
+										$lesson -> unconfirm($data['users_login']);
+									}
+								}
+								$this -> log["success"][] = _LINE . " $line: " . _NEWLESSONASSIGNMENT . " " . $lessons_name . " - " . $data['users_login'];
+							}
+				
+						} else if ($lessons_name != "") {
+							$lesson = EfrontLesson::createLesson(array("name" => $lessons_name, 'course_only' => false));
+							$this -> log["success"][] = _LINE . " $line: " . _NEWLESSON . " " . $lessons_name;
+								
+							$lesson -> addUsers($data['users_login'], (isset($data['user_type'])?$data['user_type']:"student"));
+								
+							$lessons_ID = $lesson -> lesson['id'];
+							$this -> lessonNamesToIds[$lessons_name] = array($lessons_ID);							
+							eF_updateTableData("users_to_lessons", $data, "users_login = '" .$data['users_login']. "' AND lessons_ID = " . $lessons_ID);
+							
+							if ($data['active']) {
+								$lesson -> confirm($data['users_login']);
+							} else {
+								$lesson -> unconfirm($data['users_login']);
+							}
+								
+							$this -> log["success"][] = _LINE . " $line: " . _NEWLESSONASSIGNMENT . " " . $lessons_name . " - " . $data['users_login'];
+						} else {
+							$this -> log["failure"][] = _LINE . " $line: " . _COULDNOTFINDLESSON . " " . $lessons_name;
+						}
+					} else {
+						$this -> log["failure"][] = _LINE . " $line: " . _USERDOESNOTEXIST. ": " . $data['users_login'];
+					}
+					break;					
 				case "users_to_groups":
 					//debug();
 					$groups_ID = $this -> getGroupByName($data['groups.name']);

@@ -65,6 +65,9 @@ if (isset($_GET['edit_question'])) {                                            
 } else {
     $postTarget = basename($_SERVER['PHP_SELF'])."?ctg=tests&add_question=1&from_unit=".$_GET['from_unit']."&question_type=".$question_type;
 }
+if (isset($_GET['return'])) {
+	$postTarget .= '&return='.$_GET['return'];
+}
 //We asked to add/edit a question through the tests interface, so we must return there after submission
 if (strpos($_SERVER['HTTP_REFERER'], 'edit_test') !== false) {
     preg_match("/edit_test=(\d+)/", $_SERVER['HTTP_REFERER'], $matches);
@@ -477,11 +480,19 @@ if ($form -> isSubmitted() && $form -> validate()) {
                     }
                 }
             } #cpp#endif
-            eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests$location&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success&tab=question");
+            if (isset($_GET['return'])) {
+            	eF_redirect(basename($_SERVER['PHP_SELF']).'?'.urldecode($_GET['return'])."&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success");
+            } else {
+            	eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests$location&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success&tab=question");
+            }
         } else {
             $currentQuestion -> question = array_merge($currentQuestion -> question, $question_values);		//This way, latter values (new ones) replace former (current ones);
             $currentQuestion -> persist();          //Update the question
-            eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests$location&message=".rawurlencode(_SUCCESFULLYUPDATEDQUESTION)."&message_type=success&tab=question");             //&question is used for the tabber to enable the correct tab
+            if (isset($_GET['return'])) {
+            	eF_redirect(basename($_SERVER['PHP_SELF']).'?'.urldecode($_GET['return'])."&message=".rawurlencode(_SUCCESFULLYUPDATEDQUESTION)."&message_type=success");
+            } else {
+            	eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests$location&message=".rawurlencode(_SUCCESFULLYUPDATEDQUESTION)."&message_type=success&tab=question");             //&question is used for the tabber to enable the correct tab
+            }
         }
     } else {                                                                                    //We are inserting a new question
         $newQuestion = Question :: createQuestion($question_values);
@@ -505,11 +516,15 @@ if ($form -> isSubmitted() && $form -> validate()) {
                 }
             }
         } #cpp#endif
-        if ($form -> exportValue('submit_question')) {
-            eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests&from_unit=".$_GET['from_unit']."$location&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success&tab=question");             //&question is used for the tabber to enable the correct tab
-        } else {
-            eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests&from_unit=".$_GET['from_unit']."&add_question=1&difficulty=".$question_values['difficulty']."&content_ID=".$question_values['content_ID']."&question_type=".$_GET['question_type']."&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success");
-        }
+            if (isset($_GET['return'])) {
+            	eF_redirect(basename($_SERVER['PHP_SELF']).'?'.urldecode($_GET['return'])."&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success");
+            } else {
+            	if ($form -> exportValue('submit_question')) {
+            		eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests&from_unit=".$_GET['from_unit']."$location&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success&tab=question");             //&question is used for the tabber to enable the correct tab
+            	} else {
+            		eF_redirect("".ltrim(basename($_SERVER['PHP_SELF']), "/")."?ctg=tests&from_unit=".$_GET['from_unit']."&add_question=1&difficulty=".$question_values['difficulty']."&content_ID=".$question_values['content_ID']."&question_type=".$_GET['question_type']."&message=".rawurlencode(_SUCCESFULLYADDEDQUESTION)."&message_type=success");
+            	}
+            }
     }
 
 }

@@ -99,9 +99,9 @@ if (version_compare($dbVersion, '3.6.13') == -1) {
 	
 	
 	try {
-		if (is_file('tincan.sql')) {
+		if (is_file('tincan_queries.txt')) {
 			$GLOBALS['db'] -> Execute("set foreign_key_checks=0");
-			foreach (explode(";\n", file_get_contents('tincan.sql')) as $command) {
+			foreach (explode(";\n", file_get_contents('tincan_queries.txt')) as $command) {
 				if (trim($command)) {
 					$GLOBALS['db'] -> execute(trim($command));
 				}
@@ -116,5 +116,12 @@ if (version_compare($dbVersion, '3.6.13') == -1) {
 if (!empty($failed_queries)) {
 	throw new Exception(implode('<br/>', $failed_queries));
 }
+
+/*
+ * new version: 
+ * create index name on directions(name)
+ * create index directions_ID on lessons(directions_ID)
+ * 
+ * */
 ?>
 

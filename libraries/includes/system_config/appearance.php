@@ -7,9 +7,9 @@ if (str_replace(DIRECTORY_SEPARATOR, "/", __FILE__) == $_SERVER['SCRIPT_FILENAME
 $themeSettingsTools = array(array('text' => _THEMES, 'image' => "16x16/layout.png", 'href' => basename($_SERVER['PHP_SELF']).'?ctg=themes'));
 $smarty -> assign ("T_THEMES_LINK", $themeSettingsTools);
 $loginRedirectArray = array();
-foreach ($loadedModules as $module) {
+foreach ($loadedModules as $module) {	
 	$className = $module -> className;
-	if (isset($loadedModules[$className]) && $loadedModules[$className] -> getLandingPageSmartyTpl()) {
+	if (isset($loadedModules[$className]) && $loadedModules[$className] -> getLandingPageModule()) {
 		$loginRedirectArray[$className] = $className;
 	}
 }

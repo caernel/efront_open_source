@@ -503,7 +503,7 @@
 				{if !$T_CURRENT_USER->coreAccess.course_settings == 'change' || $T_CURRENT_USER->coreAccess.course_settings == 'change'}
 						<span id = "add_schedule_link_0">
 							<img src = "images/16x16/{if $T_CURRENT_COURSE->course.start_date}edit.png{else}add.png{/if}" alt = "{$smarty.const._ADDSCHEDULE}" title = "{$smarty.const._ADDSCHEDULE}" class = "handle" onclick = "showEdit(0)"/>
-							<img src = "images/16x16/error_delete.png" alt = "{$smarty.const._DELETESCHEDULE}" title = "{$smarty.const._DELETESCHEDULE}" class = "handle" onclick = "deleteSchedule(this, 0)" {if !$T_CURRENT_COURSE->course.start_date}style = "display:none"{/if}/>
+							<img src = "images/16x16/error_delete.png" id = "remove_schedule_link_0" alt = "{$smarty.const._DELETESCHEDULE}" title = "{$smarty.const._DELETESCHEDULE}" class = "handle" onclick = "deleteSchedule(this, 0)" {if !$T_CURRENT_COURSE->course.start_date}style = "display:none"{/if}/>
 						</span>&nbsp;
 						<img src = "images/16x16/success.png" alt = "{$smarty.const._SAVE}" title = "{$smarty.const._SAVE}" class = "ajaxHandle" id = "set_schedules_link_0" style = "display:none" onclick = "setSchedule(this, 0)"/>&nbsp;
 						<img src = "images/16x16/error_delete.png" alt = "{$smarty.const._CANCEL}" title = "{$smarty.const._CANCEL}" class = "ajaxHandle" id = "remove_schedule_link_0" style = "display:none" onclick = "hideEdit(0)" />
@@ -547,7 +547,7 @@
 							
 							<select name="stop_period" id = "stop_period_{$id}">
 										{foreach name = 'roles_list' key = 'key' item = 'item' from = $T_DAYS_AFTER_ENROLLMENT}
-														<option value="{$key}" {if ($lesson.stop_period == $key)}selected{/if}>{$item}</option>
+														<option value="{$key}" {if ($lesson.end_period == $key)}selected{/if}>{$item}</option>
 											{/foreach}
 								</select>&nbsp;{$smarty.const._DAYS}</td></tr>
 						</table>

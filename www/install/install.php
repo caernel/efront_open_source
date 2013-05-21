@@ -4,7 +4,7 @@
  */
 define("G_VERSIONTYPE_CODEBASE", "community");
 define("G_VERSIONTYPE", "community");
-define("G_BUILD", "18000");
+define("G_BUILD", "18003");
 
 session_cache_limiter('none');          //Initialize session
 session_start();
@@ -664,9 +664,14 @@ define("PHPLIVEDOCXAPI","'.$defaultConfig['phplivedocx_server'].'");
 				//Check whether the db exists. If not, create it
 				try {
 					$db -> NConnect($values['db_host'], $values['db_user'], $values['db_password'], $values['db_name']);
+					$db_exists = true;
 				} catch (Exception $e) {
 					$db -> Execute("create database ".$values['db_name']." DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");                          //Create the new database
 					$db -> NConnect($values['db_host'], $values['db_user'], $values['db_password'], $values['db_name']);
+				}
+				if ($db_exists && $values['submit_form']) {					
+					$smarty->assign("T_FAILED_TABLES", true);
+					throw new Exception ('A database with this name already exists. If you continue, all of its tables will be deleted');
 				}
 				if ($values['db_type'] == 'mysql') {
 					$db -> Execute("SET NAMES 'UTF8'");
@@ -700,11 +705,18 @@ define("PHPLIVEDOCXAPI","'.$defaultConfig['phplivedocx_server'].'");
 ?>';
 				file_put_contents($path."phplivedocx_config.php", $phplivedocxConfig);
 
-				eF_updateTableData("users", array('email' => $values['admin_email'], 'password' => EfrontUser::createPassword($values['admin_password'])));
+				eF_updateTableData("users", array('email' => $values['admin_email'], 'password' => EfrontUser::createPassword($values['admin_password']), 'last_login' => ''));
 				eF_updateTableData("users", array('login' => $values['admin_name']), "id=1");
 				eF_updateTableData("courses", array('created' => time()));
 				eF_updateTableData("courses", array('created' => time(), 'creator_LOGIN' => $values['admin_name']));
 				eF_updateTableData("lessons", array('created' => time(), 'creator_LOGIN' => $values['admin_name']));
+				eF_updateTableData("users_to_courses", array('from_timestamp' => time()));
+				eF_updateTableData("users_to_lessons", array('from_timestamp' => time()));
+				eF_deleteTableData("logs", "");
+				eF_deleteTableData("events", "");
+				
+				EfrontConfiguration::setValue("database_version", G_VERSION_NUM);
+				EfrontConfiguration::setValue("system_Email", $values['admin_email']);
 				
 				$file   = new EfrontFile(EfrontDirectory :: normalize(getcwd()).'/lessons.zip');
 				$newFile = $file->copy(G_LESSONSPATH, true);

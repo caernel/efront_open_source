@@ -156,7 +156,9 @@ function toggleAdvancedParameters() {
 	$('ctg_type').toggle();
 	$('maximize_viewport').toggle();
 	$('object_ids').toggle();
-	$('no_before_unload').toggle();
+	if ($('no_before_unload')) {
+		$('no_before_unload').toggle();
+	}
 	$('indexed').toggle();
 	$('accessible_explanation').toggle();
 	if ($('advenced_parameter_image').className.match("down")) {

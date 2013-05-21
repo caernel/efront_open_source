@@ -1588,7 +1588,8 @@ class EfrontTest
 			$testString .= '<span style = "vertical-align:middle;font-weight:bold">'._QUESTION.'&nbsp;'. ($count++).'</span>
                                 '.($this -> options['display_weights'] || $done && !$isFeedback ? '<span style = "vertical-align:middle;margin-left:10px">('._WEIGHT.'&nbsp;'.$weight.'%)</span>' : '').'
                                 '.($units[$question -> question['content_ID']] && $done ? '<span style = "vertical-align:middle;margin-left:10px">'._UNIT.' "'.$units[$question -> question['content_ID']].'"</span>' : '').'
-								'.(($_SESSION['s_type'] == "student" && $currentLesson -> options['content_report'] == 1)? '<a href = "content_report.php?ctg=tests&edit_question='.$question -> question['id'].'&question_type='.$question -> question['type'].'&lessons_Id='.$_SESSION['s_lessons_ID'].'" onclick = "eF_js_showDivPopup(event, \''._CONTENTREPORT.'\', 1)" target = "POPUP_FRAME"><img src = "images/16x16/warning.png" border=0 style = "vertical-align:middle" alt = "'._CONTENTREPORT.'" title = "'._CONTENTREPORT.'"/></a>' : '').'
+								'.(($_SESSION['s_lesson_user_type'] == "student" && $currentLesson -> options['content_report'] == 1)? '<a href = "content_report.php?ctg=tests&edit_question='.$question -> question['id'].'&question_type='.$question -> question['type'].'&lessons_Id='.$_SESSION['s_lessons_ID'].'" onclick = "eF_js_showDivPopup(event, \''._CONTENTREPORT.'\', 1)" target = "POPUP_FRAME"><img src = "images/16x16/warning.png" border=0 style = "vertical-align:middle" alt = "'._CONTENTREPORT.'" title = "'._CONTENTREPORT.'"/></a>' : '').'
+								'.($_SESSION['s_lesson_user_type'] == "professor" ? '<a href = "'.basename($_SERVER['PHP_SELF']).'?ctg=tests&edit_question='.$question->question['id'].'&question_type='.$question->question['type'].'&lessonId='.$currentLesson->lesson['id'].'&return='.urlencode($_SERVER['QUERY_STRING']).'" style = "float:right;line-height:32px;"><img src = "images/16x16/edit.png" alt = "'._EDIT.'" title = "'._EDIT.'" style = "loat:right;vertical-align:middle"/></a>' : '').'
 							</td></tr>
                     </table>';
 			if ($done) {
@@ -1612,6 +1613,9 @@ class EfrontTest
 */				
 				$testString .= $questionString;
 			} else {
+				if ($this->preview_correct) {
+					$question->preview_correct = true;
+				}
 				$questionString = $question -> toHTML($form);
 /*				if (!$GLOBALS['configuration']['disable_questions_pool'] && preg_match("#content/lessons/(\d+)/#", $questionString, $matches)) {
 					if ($matches[1] != $this -> test['lessons_ID']) {	
@@ -1685,7 +1689,7 @@ class EfrontTest
 
             }
         }
-//pr($testQuestions);
+
         if (!$done && $this -> options['onebyone']) {
         	if ($GLOBALS['rtl']) {
         		$next_question_handle = 'arrow_left.png';
@@ -1764,7 +1768,7 @@ class EfrontTest
      * @since 3.5.2
      * @access public
      */
-    public function toHTML($testString, $remainingTime = false, $freeze = false) {  	
+    public function toHTML($testString, $remainingTime = false, $freeze = false) {  
     	$str = '<script>
                     var questionHours = new Array();
                     var questionMinutes = new Array();
@@ -2179,7 +2183,7 @@ class EfrontCompletedTest extends EfrontTest
      * Print HTML version of test, along with header information
      *
      * This function enhances the toHTMLQuickForm() output, in that it adds
-     * a header with test infor mation to the HTML code.
+     * a header with test information to the HTML code.
      * <br/>Example:
      * <code>
      * $result = eF_getTableData("completed_tests", "*", "id=32");
@@ -3059,8 +3063,11 @@ class MultipleOneQuestion extends Question implements iQuestion
             //$separators[] = "<br><span class = 'orderedList'>[".($k + 2)."]&nbsp;</span>";
         }
         //$form -> addGroup($elements, "question[".$this -> question['id']."]", "<span class = 'orderedList'>[1]&nbsp;</span>", $separators, false);        //Create a group with the above radio buttons
+        
         if ($this -> userAnswer !== false) {
             $form -> setDefaults(array("question[".$this -> question['id']."]" => $this -> userAnswer));
+        } else if ($this->preview_correct) {
+        	$form -> setDefaults(array("question[".$this -> question['id']."]" => $this -> answer[0]));
         }
     }
 
@@ -3357,6 +3364,8 @@ class MultipleManyQuestion extends Question implements iQuestion
             $form -> addElement("advcheckbox", "question[".$this -> question['id']."][".$index."]", $this -> options[$index], htmlspecialchars($this -> options[$index]), 'class = "inputCheckbox"', array(0, 1));
             if ($this -> userAnswer !== false) {
                 $form -> setDefaults(array("question[".$this -> question['id']."][".$index."]" => $this -> userAnswer[$index]));
+            } else if ($this->preview_correct) {
+            	$form -> setDefaults(array("question[".$this -> question['id']."][".$index."]" => $this -> answer[$index]));
             }
         }
 
@@ -3700,6 +3709,8 @@ class TrueFalseQuestion extends Question implements iQuestion
         //$form -> addGroup($elements, "question[".$this -> question['id']."]", null, "<br/>", false);
         if ($this -> userAnswer !== false) {
             $form -> setDefaults(array("question[".$this -> question['id']."]" => $this -> userAnswer));
+        } else if ($this->preview_correct) {
+        	$form -> setDefaults(array("question[".$this -> question['id']."]" => $this -> answer));
         }
     }
 
@@ -3983,6 +3994,8 @@ class EmptySpacesQuestion extends Question implements iQuestion
             }
             if ($this -> userAnswer !== false) {
                 $form -> setDefaults(array("question[".$this -> question['id']."][$k]" => $this -> userAnswer[$k]));
+            } else if ($this->preview_correct) {
+            	$form -> setDefaults(array("question[".$this -> question['id']."][$k]" => $this -> answer[$k]));
             }
         }
         $elements[] = $form -> addElement("static", null, null, $inputLabels[$k]);
@@ -4326,7 +4339,9 @@ class MatchQuestion extends Question implements iQuestion
             $elements[]   = $form -> addElement("select", "question[".$this -> question['id']."][".$index."]", $options, $answers);
 
             if ($this -> userAnswer !== false) {
-                 $form -> setDefaults(array("question[".$this -> question['id']."][$index]" => $this -> userAnswer[$index]));
+            	$form -> setDefaults(array("question[".$this -> question['id']."][$index]" => $this -> userAnswer[$index]));
+            } else if ($this->preview_correct) {
+            	$form -> setDefaults(array("question[".$this -> question['id']."][$index]" => $index));
             }
         }
     }
@@ -4629,7 +4644,9 @@ class RawTextQuestion extends Question implements iQuestion
 	        $elements[] = $form -> createElement("file",     "file_".$this -> question['id'].'[0]', null, 'class = "inputText" id = "file_'.$this -> question['id'].'[0]" style = "display:none"');
 		}
         if ($this -> userAnswer !== false) {
-             $form -> setDefaults(array("question[".$this -> question['id']."]" => $this -> userAnswer));
+        	$form -> setDefaults(array("question[".$this -> question['id']."]" => $this -> userAnswer));
+        } else if ($this->preview_correct) {
+        	$form -> setDefaults(array("question[".$this -> question['id']."]" => $this -> answer));
         }
         $form -> addGroup($elements, "question[".$this -> question['id']."]", null, "<br/>", false);
     }
@@ -4965,11 +4982,14 @@ class DragDropQuestion extends Question implements iQuestion
             //$elements[]   = $form -> addElement("static", "question[".$this -> question['id']."][".$index."]", );
             //$elements[] = $form -> addElement("static", null, null, $this -> answer[$random[$k]]);
             if ($this -> userAnswer !== false) {
-                 $form -> setDefaults(array("question[".$this -> question['id']."][$index]" => $this -> userAnswer[$index]));
+            	$form -> setDefaults(array("question[".$this -> question['id']."][$index]" => $this -> userAnswer[$index]));
+            } else if ($this->preview_correct) {
+            	$form -> setDefaults(array("question[".$this -> question['id']."][$index]" => $this->answer[$index]));
             } else {
             	//$form -> setDefaults(array("question[".$this -> question['id']."][$index]" => htmlspecialchars($this -> answer[$k])));
             	//$form -> freeze(array("question[".$this -> question['id']."][$index]"));
             }
+            
         }
         //$form -> addGroup($elements, "question[".$this -> question['id']."]", "<span class = 'orderedList'>[1]&nbsp;</span>", $separators, false);
     }
@@ -5018,19 +5038,24 @@ class DragDropQuestion extends Question implements iQuestion
         </script>";
 
         $questionString .= '
-                    <table class = "unsolvedQuestion dragDropQuestion" style = "width:auto">
+                    <table class = "unsolvedQuestion dragDropQuestion" style = "width:auto;min-width:300px">
                         <tr><td colspan = "3">'.glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']).' '.$this -> getCounter().'</td></tr>';
         foreach ($formArray['question'][$this -> question['id']] as $key => $value) {
+        	if ($this->preview_correct) {
+        		$label = $formArray['question'][$this -> question['id']][$key]['label'];
+        	} else {
+        		$label = $formArray['question'][$this -> question['id']][$random[$key]]['label'];
+        	}
         	$questionString .= "
-        				<tr><td style = 'width:30%;' class = 'droppable' id = 'secondlist_".$this -> question['id']."_$key'>
+        				<tr><td style = 'min-width:100px;' class = 'droppable' id = 'secondlist_".$this -> question['id']."_$key'>
         						<input type = 'hidden' value = '".$random[$key]."'>
-        						".$formArray['question'][$this -> question['id']][$random[$key]]['label']."
+        						".$label."
         						<script>dragDropQuestionKeys[".$this -> question['id']."].push($key);
         							//Droppables.add('secondlist_".$this -> question['id']."_$key', {accept:'draggable', onDrop:handleDrop});
         						</script>
         					</td>
-        					<td style = 'width:20%;' class = 'dragDropTarget'></td>
-        					<td style = 'width:20%;height:100%;border:1px dotted gray' id = 'source_".$this -> question['id']."_$key'>
+        					<td style = 'min-width:50px;' class = 'dragDropTarget'></td>
+        					<td style = 'min-width:100px;height:100%;border:1px dotted gray' id = 'source_".$this -> question['id']."_$key'>
         						<div class = 'draggable' id = 'firstlist_".$this -> question['id']."_$key'>".$this -> answer[$key].$value['html']."</div>
             					<script>
             						//new Draggable('firstlist_".$this -> question['id']."_$key', {revert:'failure', onStart:handleDrag});

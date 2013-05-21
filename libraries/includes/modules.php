@@ -204,7 +204,16 @@ try {
         		//eF_deleteFolder(G_MODULESPATH.$module_folder.'/');
         	}
         }
-    }
+    }elseif(isset($_GET['export_module'])  && eF_checkParameter($_GET['export_module'], 'filename')) {
+    	if (isset($currentUser -> coreAccess['modules'])) {
+			throw new EfrontSystemException(_UNAUTHORIZEDACCESS, EfrontSystemException::UNAUTHORIZED_ACCESS);
+		}
+        $className = $_GET['export_module'];        		
+		$directory = new EfrontDirectory(G_MODULESPATH . $className);
+        $file = $directory -> compress(false, false);
+        echo $file['url_path'];
+		exit;
+	}
 } catch (Exception $e) {
 	handleAjaxExceptions($e);
 }

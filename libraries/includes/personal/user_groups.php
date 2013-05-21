@@ -13,9 +13,9 @@ if (isset($currentUser->coreAccess['users']) && $currentUser->coreAccess['users'
 	$_change_groups_ = false;
 	$_self_groups_ = true;
 #cpp#ifdef ENTERPRISE
-} else if (!$currentEmployee -> isSupervisor()) {
+} else if (G_VERSIONTYPE == 'enterprise' && !$currentEmployee -> isSupervisor()) {
 	$_change_groups_ = $_self_groups_ = false;
-} else if ($currentEmployee -> supervisesEmployee($editedUser->user['login'])) {
+} else if (G_VERSIONTYPE == 'enterprise' && $currentEmployee -> supervisesEmployee($editedUser->user['login'])) {
 	$_change_groups_ = $_self_groups_ = true;
 #cpp#endif		
 } else {

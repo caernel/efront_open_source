@@ -57,7 +57,6 @@ function askUsers() {
 			eF_getRights();
 		}
 	} #cpp#endif
-
 //	$_POST['preffix'] = "%";	// Useful for debugging
 	if (isset($_POST['preffix'])) {
 		if (mb_strpos($_POST['preffix'], ";") === false) {
@@ -87,8 +86,8 @@ function askUsers() {
 				$logins   = array();
 				$size = sizeof($students);
 				for ($i = 0; $i < $size; $i++) {
-					if (!in_array($students[$i], $logins)){
-						$logins[] = $students[$i];
+					if (!isset($logins[$students[$i]])){
+						$logins[$students[$i]] = $students[$i];
 					}
 				}
 				$logins[] = $_SESSION['s_login'];
@@ -97,10 +96,10 @@ function askUsers() {
 					// Append to logins array the employees of supervisor
 					if (isset($user ->aspects['hcd']) && $user ->aspects['hcd']->isSupervisor()) {
 						include_once $path."module_hcd_tools.php";
-						$supervised_employees = eF_getTableData("users LEFT OUTER JOIN module_hcd_employee_has_job_description ON users.login = module_hcd_employee_has_job_description.users_LOGIN LEFT OUTER JOIN module_hcd_employee_works_at_branch ON users.login = module_hcd_employee_works_at_branch.users_LOGIN","users.login","(users.user_type <> 'administrator' AND ((module_hcd_employee_works_at_branch.branch_ID IN (" . $_SESSION['supervises_branches'] ." ) AND module_hcd_employee_works_at_branch.assigned='1'))) AND active = 1 GROUP BY login", "login");
+						//$supervised_employees = eF_getTableData("users LEFT OUTER JOIN module_hcd_employee_has_job_description ON users.login = module_hcd_employee_has_job_description.users_LOGIN LEFT OUTER JOIN module_hcd_employee_works_at_branch ON users.login = module_hcd_employee_works_at_branch.users_LOGIN","users.login","(users.user_type <> 'administrator' AND ((module_hcd_employee_works_at_branch.branch_ID IN (" . $_SESSION['supervises_branches'] ." ) AND module_hcd_employee_works_at_branch.assigned='1'))) AND active = 1 GROUP BY login", "login");
 						foreach ($supervised_employees as $employee) {
-							if (!in_array($employee['login'], $logins)) {
-								$logins[] = $employee['login'];
+							if (!isset($logins[$employee['login']])) {
+								$logins[$employee['login']] = $employee['login'];
 							}
 
 						}
@@ -110,6 +109,7 @@ function askUsers() {
 				$students_list = "'".implode("','", $logins)."'";
 				$users         = eF_getTableData("users", "login,name,surname,user_type,user_types_ID", "login IN ($students_list) AND (login like '$preffix%' OR name like '$preffix%' OR surname like '$preffix%' OR user_type like '$preffix%')", "login");
 			}
+			
 		// Return active users for messaging:
 		// - admins: all
 		// - supervisors: all
@@ -145,8 +145,8 @@ function askUsers() {
 
 						$logins = array();
 						foreach($result['users_LOGIN'] as $login) {
-							if (!in_array($login, $logins)){
-								$logins[] = $login;
+							if (!isset($logins[$login])){
+								$logins[$login] = $login;
 							}
 						}
 					}
@@ -159,8 +159,8 @@ function askUsers() {
 
 						$result = eF_getTableDataFlat("users JOIN users_to_courses", "distinct users_LOGIN", "users.active = 1 and users.login = users_to_courses.users_LOGIN AND  users.archive=0 and users_to_courses.archive=0 AND courses_ID IN ('" . implode("','", $myCoursesIds) ."')");
 						foreach($result['users_LOGIN'] as $login) {
-							if (!in_array($login, $logins)){
-								$logins[] = $login;
+							if (!isset($logins[$login])){
+								$logins[$login] = $login;
 							}
 						}
 					}
@@ -171,8 +171,8 @@ function askUsers() {
 						if (!empty($branches)) {
 							$result = eF_getTableDataFlat("users JOIN module_hcd_employee_works_at_branch", "users_LOGIN", "users.login = module_hcd_employee_works_at_branch.users_LOGIN AND branch_ID IN ('". implode("','", $branches)."')");
 							foreach($result['users_LOGIN'] as $login) {
-								if (!in_array($login, $logins)){
-									$logins[] = $login;
+								if (!isset($logins[$login])){
+									$logins[$login] = $login;
 								}
 							}
 						}
@@ -206,7 +206,6 @@ function askUsers() {
 		$users = array_values($users);
 	}
 		
-	
 	for ($k = 0; $k < sizeof($users); $k++){
 		/*$hilogin = highlightSearch($users[$k]['login'], $preffix);
 		 $hiname = highlightSearch($users[$k]['name'], $preffix);
@@ -220,7 +219,7 @@ function askUsers() {
 		if ($users[$k]['login'] == '[*]') {
 			$formattedLogins[$users[$k]['login']] = $hiname;
 		} else {
-			$formattedLogins[$users[$k]['login']] = formatLogin(false, array('login' => $hilogin, 'name' => $hiname, 'surname' => $hisurname, 'user_type' => $hiusertype));
+			$formattedLogins[$users[$k]['login']] = formatLogin($hilogin, array('login' => $hilogin, 'name' => $hiname, 'surname' => $hisurname, 'user_type' => $hiusertype));
 		}
 
 		//$str = $str.'<li id='.$users[$k]['login'].'>'.$formattedLogin.'</li>';
@@ -238,10 +237,11 @@ function askUsers() {
 	$strs = array();
 	$strs[] =  '<ul>';
 	for ($k = 0; $k < sizeof($users); $k++){
-		$strs[] = '<li id='.$users[$k]['login'].'>'.$formattedLogins[$users[$k]['login']].'</li>';
+		$strs[] = '<li id="'.htmlentities($users[$k]['login']).'">'.htmlentities($formattedLogins[$users[$k]['login']]).'</li>';
 	}
 
 	$strs[] = '</ul>';
+	
 	echo implode("", $strs);
 	
 }

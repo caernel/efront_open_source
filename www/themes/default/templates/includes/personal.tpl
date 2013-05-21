@@ -74,7 +74,7 @@
 		{foreach name = "avatars_list" item = "item" key = "key" from = $T_SYSTEM_AVATARS}
 			{if $smarty.foreach.avatars_list.first}{assign var="item" value = "unknown_small.png"}{/if}
 			<td class = "centerAlign ">
-				<img src = "{$smarty.const.G_SYSTEMAVATARSURL}{$item}" class = "ajaxHandle" alt = "{$item}" title = "{$item}" onclick = "parent.$('select_avatar').selectedIndex = '{$smarty.foreach.avatars_list.index}';parent.$('popup_close').onclick();window.close();"/>
+				<img src = "{$smarty.const.G_SYSTEMAVATARSURL}{$item}" class = "ajaxHandle" alt = "{$item}" title = "{$item}" onclick = "parent.$('select_avatar').selectedIndex = '{$smarty.foreach.avatars_list.index}';parent.eF_js_showDivPopup('','');"/>
 				<br/>{$item}
 			</td>
 			{if $smarty.foreach.avatars_list.iteration % 4 == 0}</tr><tr>{/if}

@@ -68,6 +68,11 @@ function onCartOperation(el, response) {
 	}
 
     $('cart').innerHTML = tableText[1];
+	if ($('cart').select('.cartElement').length == 0) {
+		$('cart').ancestors().each(function(s) {if (s.hasClassName('block')) s.hide();})
+	} else {
+		$('cart').ancestors().each(function(s) {if (s.hasClassName('block')) s.show();})
+	}
 	//$('cart').innerHTML = response;
 }
 
@@ -185,3 +190,10 @@ if (getCookie('hidden_catalog_entries') && getCookie('hidden_catalog_entries').e
 	var ids = getCookie('hidden_catalog_entries').evalJSON(true);
 	ids.each(function (s) {showHideDirections($('subtree_img'+s), $('subtree_children_'+s) ? $('subtree_children_'+s).innerHTML : '', s, 'hide')})
 }
+
+document.observe("dom:loaded", function() {
+	//console.log($('cart').select('.cartElement').length)
+	if ($('cart') && $('cart').select('.cartElement').length == 0) {
+		$('cart').ancestors().each(function(s) {if (s.hasClassName('block')) s.hide();})
+	}
+});

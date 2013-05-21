@@ -123,8 +123,12 @@ class XMLExport{
 				$imgUrl = $img['file'];
 			else{
 				//$imgUrl = G_SERVERNAME.'themes/default/images/certificate_logos/'.$img['file'];
-				$imgFile = new EfrontFile(G_DEFAULTIMAGESPATH."certificate_logos/".$img['file']);
-				$imgUrl = $imgFile['path'];
+				try {
+					$imgFile = new EfrontFile(G_DEFAULTIMAGESPATH."certificate_logos/".$img['file']);
+					$imgUrl = $imgFile['path'];
+				} catch (Exception $e) {
+					//simply bypass image
+				}
 			}
 
 			$this->showImage($pdf, $imgUrl, $img['x'], $img['y']);
@@ -258,12 +262,13 @@ class XMLExport{
 
 		if($course){
 			
-			if($course['align'])
+			if($course['align']) {
 				$this->showLabelAligned($pdf, $courseName, $course['font'], $course['weight'], $course['size'], $course['color'],
 													$course['x'], $course['y'], $course['align']);
-			else
+			} else {
 				$this->showLabel($pdf, $courseName, $course['font'], $course['weight'], $course['size'],
 													$course['color'], $course['x'], $course['y']);
+			}
 		}
 	}
 
@@ -274,7 +279,7 @@ class XMLExport{
 		if($grade)
 			$this->showLabel($pdf, $courseGrade, $grade['font'], $grade['weight'], $grade['size'], $grade['color'], $grade['x'], $grade['y']);
 	}
-
+/*
 	private function showLabelAligned($p, $txt, $font, $font_weight, $font_size, $color, $x, $y, $a=''){
 
 		$cell = '';
@@ -297,7 +302,32 @@ class XMLExport{
 		$p->SetTextColor($rgb['r'], $rgb['g'], $rgb['b']);
 		$p->Cell(0, 13, $txt, 0, 0, $align);
 	}
-
+*/
+	//Replaced old showLabelAligned() with this one, that uses MultiCell() which supports text wrapping
+	private function showLabelAligned($p, $txt, $font, $font_weight, $font_size, $color, $x, $y, $a=''){
+	
+		$cell = '';
+		$align = 'C';
+		$fw = '';
+	
+		$align = (($a == 'Center' || $a == 'center') ? 'C' : (($a == 'Left' || $a == 'left') ? 'L' : ($a == 'Right' || $a == 'right') ? 'R' : ''));
+		$rgb = $this->setColor($color);
+		if($font_weight != ''){
+			switch($font_weight){
+	
+				case($font_weight == 'Bold' || $font_weight == 'bold' || $font_weight == 'BOLD'): $fw = 'B'; break;
+				case($font_weight == 'Italic' || $font_weight == 'italic' || $font_weight == 'ITALIC'): $fw = 'I'; break;
+				case($font_weight == 'Bold|Italic' || $font_weight == 'bold|italic' || $font_weight == 'BOLD|ITALIC'): $fw = 'BI'; break;
+			}
+		}
+		$p->SetFont('');
+				
+		$p->SetFont($font, $fw, floatval($font_size));
+		$p->SetY($y);
+		$p->SetTextColor($rgb['r'], $rgb['g'], $rgb['b']);
+		$p->MultiCell(0, 0, $txt, 0, $align, false, 1, $x, $y, true, 0, false, true, 0, 'T', false);
+	}
+	
 	private function showLabel($p, $txt, $font, $font_weight, $font_size, $color, $x, $y){
 
 		$fw = '';
@@ -316,6 +346,28 @@ class XMLExport{
 		$p->SetTextColor($rgb['r'], $rgb['g'], $rgb['b']);
 		$p->SetFont($font, $fw, floatval($font_size));
 		$p->Text($x, $y, $txt);
+		pr($txt);
+	}
+	
+	private function showLabel2($p, $txt, $font, $font_weight, $font_size, $color, $x, $y){
+	
+		$fw = '';
+	
+		if($font_weight != ''){
+	
+			switch($font_weight){
+	
+				case($font_weight == 'Bold' || $font_weight == 'bold' || $font_weight == 'BOLD'): $fw = 'B'; break;
+				case($font_weight == 'Italic' || $font_weight == 'italic' || $font_weight == 'ITALIC'): $fw = 'I'; break;
+				case($font_weight == 'Bold|Italic' || $font_weight == 'bold|italic' || $font_weight == 'BOLD|ITALIC'): $fw = 'BI'; break;
+			}
+		}
+	
+		$rgb = $this->setColor($color);
+		$p->SetTextColor($rgb['r'], $rgb['g'], $rgb['b']);
+		$p->SetFont($font, $fw, floatval($font_size));
+		$p->MultiCell($x, $y, $txt);
+		pr($txt);
 	}
 
 	private function showImage($p, $file, $x, $y){

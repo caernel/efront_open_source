@@ -10,9 +10,9 @@ if (G_VERSIONTYPE != 'community') {  #cpp#ifndef COMMUNITY
 	} else if ($currentUser->user['user_type'] == 'administrator') {
 		$canAddPayment = true;
 #cpp#ifdef ENTERPRISE	
-	} else if (!$currentEmployee->isSupervisor()) {
+	} else if (G_VERSIONTYPE == 'enterprise' && !$currentEmployee->isSupervisor()) {
 		$canAddPayment = false;
-	} else if ($currentEmployee -> supervisesEmployee($editedUser->user['login'])) {
+	} else if (G_VERSIONTYPE == 'enterprise' && $currentEmployee -> supervisesEmployee($editedUser->user['login'])) {
 		$canAddPayment = true;
 #cpp#endif	
 	} else {

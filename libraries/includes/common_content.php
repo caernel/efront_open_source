@@ -714,9 +714,9 @@ if (isset($_GET['add']) || (isset($_GET['edit']) && in_array($_GET['edit'], $leg
             $userObj = new stdClass();
             $userObj->name=array($currentUser->user['name'].' '.$currentUser->user['surname']);
             $userObj->account = new stdClass();
-            $userObj->account->accountServiceHomePage=array(G_SERVERNAME);			//These 2 for 0.9
+            $userObj->account->accountServiceHomePage=array($_SERVER['HTTP_HOST']);			//These 2 for 0.9
             $userObj->account->accountName=array($currentUser->user['login']);
-            $userObj->account->homePage=G_SERVERNAME;								//These 2 for 0.95
+            $userObj->account->homePage=$_SERVER['HTTP_HOST'];								//These 2 for 0.95
             $userObj->account->name=$currentUser->user['login'];
             $currentUnit['data'] = str_replace(
             		array(

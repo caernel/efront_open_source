@@ -190,8 +190,10 @@ class module_administrator_tools extends EfrontModule {
 		$form -> addElement('static', 'autocomplete_note', _STARTTYPINGFORRELEVENTMATCHES);
 		$form -> addElement('text', 'new_login', _MODULE_ADMINISTRATOR_TOOLS_NEWLOGIN, 'class = "inputText"');
 		$form -> addElement('hidden', 'users_LOGIN', '' , 'id="module_administrator_tools_users_LOGIN"');
+		$form -> registerRule('checkParameter', 'callback', 'eF_checkParameter');
 		$form -> addRule('selection_user', _THEFIELD.' "'._USER.'" '._ISMANDATORY, 'required', null, 'client');
-		$form -> addRule('users_LOGIN', _MODULE_ADMINISTRATOR_TOOLS_THISUSERWASNOTFOUND, 'required', null, 'client');
+		$form -> addRule('users_LOGIN', _MODULE_ADMINISTRATOR_TOOLS_THISUSERWASNOTFOUND, 'required', null, 'client');		
+		$form -> addRule('new_login', _THEFIELD.' '._MODULE_ADMINISTRATOR_TOOLS_NEWLOGIN.' '._HASINVALIDCHARACTERS.'. '._ONLYALLOWEDCHARACTERSLOGIN, 'checkParameter', 'login');
 		$form -> addElement('submit', 'submit', _SUBMIT, 'class = "flatButton"');
 
 		if ($form -> isSubmitted() && $form -> validate()) {

@@ -4295,4 +4295,7 @@ define("_FILTERBYOBJECT","Φίλτρο αντικειμένου (object)");
 define("_SELECTOBJECTFROMLIST", "Επιλέξτε ένα αντικείμενα από τη λίστα");
 define("_SELECTVERBFROMLIST", "Επιλέξτε ένα ρήμα από τη λίστα");
 define("_GOTO", "Μετάβαση σε");
+define("_USERSTOLESSONS", "Αναθέσεις μαθημάτων σε χρήστες");
+define("_NEWLESSONASSIGNMENT", "Νέα ανάθεση μαθήματος");
+define("_COULDNOTFINDLESSON", "Το μάθημα δε βρέθηκε");
 ?>

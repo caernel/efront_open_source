@@ -6,8 +6,15 @@ if (str_replace(DIRECTORY_SEPARATOR, "/", __FILE__) == $_SERVER['SCRIPT_FILENAME
 }
 $loadScripts[] = 'scriptaculous/controls';
 $loadScripts[] = 'includes/tests';
-if (!$_student_) {
+if (!$_student_) {	
     $showTest = new EfrontTest($_GET['view_unit'], true);
+    if (isset($_GET['show_all'])) {
+    	$showTest -> options['random_pool'] = false;
+    	$showTest -> options['onebyone'] = 0;
+    }
+    if (isset($_GET['preview_correct']) && $_SESSION['s_lesson_user_type'] != 'student') {
+    	$showTest -> preview_correct = true;
+    }
     if (isset($_GET['print'])) {
         $testString = $showTest -> toHTML($showTest -> toHTMLQuickForm(), false, true);
     } else {

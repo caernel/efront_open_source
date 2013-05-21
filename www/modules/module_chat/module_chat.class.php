@@ -175,7 +175,7 @@ class module_chat extends eFrontModule{
 
 		$smarty = $this -> getSmartyVar();
 
-		$mainScripts = array_merge(array('../modules/module_chat/js/jquery', '../modules/module_chat/js/chat'),getMainScripts());
+		$mainScripts = array_merge(array('../modules/module_chat/js/chat'),getMainScripts());
 		$smarty -> assign("T_HEADER_MAIN_SCRIPTS", implode(",", $mainScripts));
 
 		//$page = $this->isPopup();

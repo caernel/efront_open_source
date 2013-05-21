@@ -1205,7 +1205,11 @@ abstract class EfrontModule
      * @since 3.6.10
      * @access public
      */
-    public function onAddUsersToCourse($courseId, $users, $lessonUsers) {
+    public function onAddUsersToCourse($courseId, $users) {
+    	return false;
+    }
+
+    public function onRemoveUsersFromCourse($courseId, $users, $lessonUsers) {
     	return false;
     }
 
@@ -1289,6 +1293,10 @@ abstract class EfrontModule
      */
 	public function onCompleteLesson($lessonId, $login) {
         return false;
+    }
+    
+    public function onCompleteUnit($unitId, $login) {
+    	return false;
     }
 
     /**
@@ -1418,5 +1426,7 @@ abstract class EfrontModule
     public static function onIndexPageLoad() {
     	return false;
     }
+	
+ 
 }
 

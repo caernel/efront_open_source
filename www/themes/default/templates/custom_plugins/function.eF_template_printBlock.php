@@ -166,6 +166,7 @@ function smarty_function_eF_template_printBlock($params, &$smarty) {
      * - selected: if it's 1, then the corresponding option will display as "selected"
      */
     $mainOptions = '';
+    
     if (isset($params['main_options']) && sizeof($params['main_options']) > 0) {
     	foreach ($params['main_options'] as $key => $value) {
     	    isset($value['onClick']) ? $value['onclick'] = $value['onClick'] : null;		//sometimes onClick is used instead of onclick.
@@ -210,7 +211,7 @@ function smarty_function_eF_template_printBlock($params, &$smarty) {
     $str = '
     <div class = "block" style = "'.$params['style'].';" id = "'.urlencode($params['title']).'" >
         <div class = "blockContents" >';
-    if ($_GET['popup']) {
+    if ($_GET['popup'] && !$params['options'][0]['image']) {
     	$str .= $params['content'];
     } else {
     	$str .= '

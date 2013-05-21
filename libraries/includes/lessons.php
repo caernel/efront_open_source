@@ -610,7 +610,7 @@ if (isset($_GET['delete_lesson']) && eF_checkParameter($_GET['delete_lesson'], '
 	        				$sort = 'login';
 	        			}
 	        			$users = eF_multiSort($users, $sort, $order);
-	        			$smarty -> assign("T_USERS_SIZE", sizeof($users));
+	        			     			
 	        			if (isset($_GET['filter'])) {
 	        				$users = eF_filterData($users, $_GET['filter']);
 	        			}
@@ -618,7 +618,8 @@ if (isset($_GET['delete_lesson']) && eF_checkParameter($_GET['delete_lesson'], '
 	        				isset($_GET['offset']) && eF_checkParameter($_GET['offset'], 'int') ? $offset = $_GET['offset'] : $offset = 0;
 	        				$users = array_slice($users, $offset, $limit, true);
 	        			}
-
+	        			
+	        			$smarty -> assign("T_USERS_SIZE", sizeof($users));
 	        			$smarty -> assign("T_ROLES", $roles);
 	        			$smarty -> assign("T_ALL_USERS", $users);
 	        			$smarty -> assign("T_LESSON_USERS", array_keys($lessonUsers));                                             //We assign separately the lesson's users, to know when to display the checkboxes as "checked"

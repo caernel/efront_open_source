@@ -28,7 +28,7 @@ class module_outlook_invitation extends EfrontModule {
 	 * @see libraries/EfrontModule#getPermittedRoles()
 	 */
 	public function getPermittedRoles() {
-		return array("administrator", "professor");
+		return array("administrator", "professor", "student");
 	}
 
 	/**
@@ -42,18 +42,44 @@ class module_outlook_invitation extends EfrontModule {
 				'link'  => $this -> moduleBaseUrl);
 	}
 
+	public function getToolsLinkInfo() {
+		$links = array('title' => $this -> getName(),
+				'image' => $this -> moduleBaseLink . 'img/outlook.png',
+				'link'  => $this -> moduleBaseUrl);
+		if ($_SESSION['s_type'] == 'professor' || (G_VERSIONTYPE == 'enterprise' && $this->getCurrentUser()->aspects['hcd']->isSupervisor())) {
+			return $links;
+		} else {
+			return false;
+		} 
+		
+	}
+	
 	public function onInstall() {
-		$result1 = eF_executeNew("CREATE TABLE if not exists module_outlook_invitation (
-				courses_ID int(11) NOT NULL,
-				email varchar(150) default null,
-				duration int(10) unsigned NOT NULL,
-				description text,
-				location text,
-				PRIMARY KEY  (courses_ID)
-		) DEFAULT CHARSET=utf8;");
+		$result1 = eF_executeNew("
+ CREATE TABLE `module_outlook_invitation` (
+  `courses_ID` int(11) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `duration` int(10) unsigned NOT NULL,
+  `description` text,
+  `location` text,
+  `subject` varchar(255) DEFAULT 'Invitation to attend training',
+  `sequence` int(11) DEFAULT '0',
+  PRIMARY KEY (`courses_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8				
+				");
 
 		return true;
 
+	}
+	
+	public function onUpgrade() {
+		try {
+			eF_executeNew("alter table module_outlook_invitation add subject varchar(255) default 'Invitation to attend training'");
+			eF_executeNew("alter table module_outlook_invitation add sequence int default 0");
+		} catch (Exception $e) {
+			
+		}
+		return true;
 	}
 
 	public function onUninstall() {
@@ -82,12 +108,52 @@ class module_outlook_invitation extends EfrontModule {
 		}
 		if (isset($_GET['delete_event']) && eF_checkParameter($_GET['delete_event'], 'id') && in_array($_GET['delete_event'], array_keys($events))) {
 			try {
-				eF_deleteTableData("module_outlook_invitation", "courses_ID=".$_GET['delete_event']);
+				$event = $events[$_GET['delete_event']];
+				$course = new EfrontCourse($event['courses_ID']);
+				$users = $course->getCourseUsers(array('active' => true, archive => false, 'return_objects' => false));
+				$recipients = array();
+				foreach ($users as $value) {
+					$recipients[] = $value['email'];
+				}
+				$this->cancelInvitation($course->course['id'], $recipients);
+				
+				eF_deleteTableData("module_outlook_invitation", "courses_ID=".$_GET['delete_event']);			
+				
 			} catch (Exception $e) {
 				header("HTTP/1.0 500 ");
 				echo $e -> getMessage().' ('.$e -> getCode().')';
 			}
 			exit;
+		}
+		
+		if ($_SESSION['s_type'] != 'administrator') {			
+			$userCourses = $currentUser->getUserCourses(array('archive' => 0, 'active' => true, 'return_objects' => false));
+			
+			if (G_VERSIONTYPE == 'enterprise') {
+				if ($_SESSION['s_current_branch']) {
+					$result = eF_getTableData("module_hcd_course_to_branch", "courses_ID", "branches_ID='{$_SESSION['s_current_branch']}'");
+				} else {
+					if ($currentUser->aspects['hcd']->isSupervisor()) {
+						$result = eF_getTableData("module_hcd_course_to_branch", "courses_ID", "branches_ID in (select branches_ID from module_hcd_employee_works_at_branch where users_login='{$currentUser->user['login']}' and supervisor=1)");
+					}
+				}
+				$branchCourses = array();
+				foreach ($result as $value) {
+					$branchCourses[$value['courses_ID']] = $value['courses_ID'];
+				}
+				
+				foreach ($events as $key=>$value) {
+					if (!isset($branchCourses[$key]) && !isset($userCourses[$key])) {
+						unset($events[$key]);
+					}
+				}
+			} else {
+				foreach ($events as $key=>$value) {
+					if (!isset($userCourses[$key])) {
+						unset($events[$key]);
+					}
+				}				
+			}
 		}
 		
 		if (!isset($_GET['course'])) {
@@ -117,10 +183,11 @@ class module_outlook_invitation extends EfrontModule {
 		} else {
 			$course = new EfrontCourse($_GET['course']);
 			
-			$form = new HTML_QuickForm("import_outlook_invitation_form", "post", $this -> moduleBaseUrl."&course={$course->course['id']}&add_event=1", "", null, true);
+			$form = new HTML_QuickForm("import_outlook_invitation_form", "post", $this -> moduleBaseUrl."&course={$course->course['id']}&add_event=1".(isset($_GET['popup']) ? '&popup=1' : ''), "", null, true);
 			$form -> registerRule('checkParameter', 'callback', 'eF_checkParameter');           //Register this rule for checking user input with our function, eF_checkParameter
 			$form -> addElement('text', 'email', _SENDER, 'class = "inputText"');
 			$form -> addElement('text', 'location', _LOCATION, 'class = "inputText"');
+			$form -> addElement('text', 'subject', _SUBJECT, 'class = "inputText"');
 			$form -> addElement('textarea', 'description', _DESCRIPTION, 'class = "inputTestTextarea" style = "width:80%;height:6em;"');
 			//$form -> addElement('checkbox', 'calendar', _MODULE_OUTLOOK_INVITATION_CREATE_CALENDAR);
 			//$form -> addElement('static', 'static', _MODULE_OUTLOOK_INVITATION_INFO);
@@ -129,10 +196,14 @@ class module_outlook_invitation extends EfrontModule {
 							
 			if (empty($events[$course->course['id']])) {	//new invitation
 				$currentEvent = null;
-				$form->setDefaults(array('email' => $currentUser->user['email']));
+				$form->setDefaults(array('email' => $currentUser->user['email'], 'subject' => 'Invitation to attend training: '.$course->course['name']));
 			} else {			//existing invitation
 				$currentEvent = $events[$course->course['id']];
-				$form->setDefaults(array('email' => $currentEvent['email'], 'description' => $currentEvent['description'], 'location' => $currentEvent['location']));
+				$form->setDefaults(array(
+						'email' => $currentEvent['email'], 
+						'description' => $currentEvent['description'],
+						'subject' => $currentEvent['subject'], 
+						'location' => $currentEvent['location']));
 			}
 
 			if ($form -> isSubmitted() && $form -> validate()) {
@@ -142,9 +213,11 @@ class module_outlook_invitation extends EfrontModule {
 					$permanent_info = array("courses_ID"  => $course->course['id'],//$form -> exportValue('autocomplete_course_hidden'),
 							"email"       => $form -> exportValue('email') ? $form -> exportValue('email') : $GLOBALS['configuration']['system_email'],
 							"location"	  => $form -> exportValue('location'),
+							"subject"	  => $form -> exportValue('subject'),
 							"description" => $form -> exportValue('description'));
 						
 					if ($currentEvent) {
+						$permanent_info['sequence'] = $currentEvent['sequence']+1;
 						eF_updateTableData("module_outlook_invitation", $permanent_info, "courses_ID={$course->course['id']}");
 					} else {
 						eF_insertTableData("module_outlook_invitation", $permanent_info);
@@ -160,10 +233,11 @@ class module_outlook_invitation extends EfrontModule {
 					}
 					
 //					$smarty->assign('T_RELOAD', true);
-		            $this ->setMessageVar(_OPERATIONCOMPLETEDSUCCESSFULLY, 'success');
-		            
-	//				eF_redirect($this -> moduleBaseUrl."&message=".urlencode(_OPERATIONCOMPLETEDSUCCESSFULLY)."&message_type=success");
-
+					if (isset($_GET['popup'])) {
+						$this ->setMessageVar(_OPERATIONCOMPLETEDSUCCESSFULLY, 'success');
+					} else {
+						eF_redirect($this -> moduleBaseUrl."&message=".urlencode(_OPERATIONCOMPLETEDSUCCESSFULLY)."&message_type=success");
+					}
 				} catch (Exception $e) {
 					$smarty -> assign("T_EXCEPTION_TRACE", $e -> getTraceAsString());
 					$this ->setMessageVar($e -> getMessage().' ('.$e -> getCode().') &nbsp;<a href = "javascript:void(0)" onclick = "eF_js_showDivPopup(event, \''._ERRORDETAILS.'\', 2, \'error_details\')">'._MOREINFO.'</a>', 'failure');
@@ -211,8 +285,13 @@ class module_outlook_invitation extends EfrontModule {
 	 * @see libraries/EfrontModule#getNavigationLinks()
 	 */
 	public function getNavigationLinks() {
-		return array (array ('title' => _HOME, 'link'  => $_SERVER['PHP_SELF']),
+		$links = array (array ('title' => _HOME, 'link'  => $_SERVER['PHP_SELF']),
 				array ('title' => $this -> getName(), 'link'  => $this -> moduleBaseUrl));
+		if ($_GET['add_event'] && $_GET['course'] && eF_checkParameter($_GET['course'], 'id')) {
+			$course = new EfrontCourse($_GET['course']);
+			$links[] = array('title' => $course->course['name'], 'link'  => $this -> moduleBaseUrl.'&course='.$_GET['course'].'&add_event=1');
+		}
+		return $links;
 	}
 
 
@@ -227,6 +306,18 @@ class module_outlook_invitation extends EfrontModule {
 		$this->sendInvitation($courseId, $recipients);
 	}
 	
+	public function onRemoveUsersFromCourse($courseId, $users) {
+		$result = eF_getTableDataFlat("users", "login,email");
+		$emails = array_combine($result['login'], $result['email']);
+		
+		foreach ($users as $value) {
+			$recipients[] = $emails[$value['users_LOGIN']];
+		}
+		
+		$this->cancelInvitation($courseId, $recipients);
+		
+		return true;
+	}
 	
 	
 	protected function sendInvitation($courseId, $recipients) {
@@ -240,19 +331,54 @@ class module_outlook_invitation extends EfrontModule {
 			return false;
 		}
 		$body =  $result[0]['description'];		//WARNING: exchange server will use the mail body for the calendar body, whereas direct clients will use the $event['description']
+		$subject = $result[0]['subject'];
 		$event = array('start_date' => $course->course['start_date'],
 				'duration' => round(($course->course['end_date'] - $course->course['start_date'])/60),
 				'description' => str_replace("\r\n", "\\n", $result[0]['description']),
 				'location' => $result[0]['location'],
+				'subject' =>  $result[0]['subject'],
 				'email' => $result[0]['email'],
+				'sequence' => $result[0]['sequence'],
 				'course_id' => $course->course['id']);		
 		
 		$calendarbody = $this->createEventContent($event);
 		file_put_contents($this -> moduleBaseDir.'calendar_'.$event['id'].'.ics', $calendarbody);
-		$flag = $this->eF_mail_multipart($event['email'], implode(",", $recipients), "Invitation to attend training: ".$course->course['name'], $body, $calendarbody, false, true);
+		$flag = $this->eF_mail_multipart($event['email'], implode(",", $recipients), $subject, $body, $calendarbody, false, true);
 	}
 	
-	protected function createEventContent($event) {
+	protected function cancelInvitation($courseId, $recipients) {
+		$course = new EfrontCourse($courseId);
+	
+		$result = eF_getTableData("module_outlook_invitation", "*", "courses_ID=".$courseId);
+		if (empty($result)) {
+			return false;
+		}
+		$body =  $result[0]['description'];		//WARNING: exchange server will use the mail body for the calendar body, whereas direct clients will use the $event['description']
+		$subject = "Cancel ".$result[0]['subject'];
+		$event = array(
+				'start_date' => $course->course['start_date'],
+				'duration' => round(($course->course['end_date'] - $course->course['start_date'])/60),
+				'description' => str_replace("\r\n", "\\n", $body),
+				'location' => $result[0]['location'],
+				'subject' =>  $subject,
+				'email' => $result[0]['email'],
+				'sequence' => $result[0]['sequence']+1,
+				'course_id' => $course->course['id']);
+	
+		$calendarbody = $this->createEventContent($event, true);
+		
+		file_put_contents($this -> moduleBaseDir.'calendar_'.$event['id'].'.ics', $calendarbody);
+		$flag = $this->eF_mail_multipart($event['email'], implode(",", $recipients), $subject, $body, $calendarbody, false, true);
+	}	
+	
+	protected function createEventContent($event, $cancel = false) {
+		if ($cancel) {
+			$method = "CANCEL";
+			$status = "CANCELLED";
+		} else {
+			$method = "REQUEST";
+			$status = "CONFIRMED";
+		}
 		
 		//$description = str_replace("\n","\\n",str_replace(";","\;",str_replace(",",'\,',$event['description']))) . "\n";
 		$end_timestamp = $event['start_date'] + $event['duration']*60;
@@ -265,27 +391,28 @@ class module_outlook_invitation extends EfrontModule {
 		$start_date->setTimezone(new DateTimeZone('utc'));
 		$end_date->setTimezone(new DateTimeZone('utc'));
 		
-		$uid = $created_date->format('Ymd\THis\Z').'-'.$event['course_id'].'@'.G_SERVERNAME;
+		//$uid = $created_date->format('Ymd\THis\Z').'-'.$event['course_id'].'@'.G_SERVERNAME;
+		$uid = 'c'.$event['course_id'].'@'.G_SERVERNAME;
 
 		//Based on RFC 5545, http://tools.ietf.org/html/rfc5545
 		$components[] = "BEGIN:VCALENDAR";
-		$components[] = "PRODID:-//Wentworth green room//eFront ".G_VERSION_NUM."//EN";
+		$components[] = "PRODID:-//".G_SERVERNAME."//eFront ".G_VERSION_NUM."//EN";
 		$components[] = "VERSION:2.0";
-		$components[] = "METHOD:REQUEST";	//optional
+		$components[] = "METHOD:{$method}";	//optional
 		$components[] = "BEGIN:VEVENT";
-		$components[] = "UID:".$uid;
-		$components[] = "CREATED:".$created_date->format('Ymd\THis\Z');
-		$components[] = "DTSTAMP:".$start_date->format('Ymd\THis\Z');
-		$components[] = "DTSTART:".$start_date->format('Ymd\THis\Z');
-		$components[] = "DTEND:".$end_date->format('Ymd\THis\Z');
-		$components[] = "DESCRIPTION:".$event['description'];		//WARNING: exchange server will use the mail body for the calendar body, whereas direct clients will use the $event['description']
-		$components[] = "SUMMARY:"."Invitation to attend training";
-		$components[] = "LOCATION:".$event['location'];
-		$components[] = "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=".$event['email'].";RSVP=TRUE:mailto:".$event['email'];
-		$components[] = "LAST-MODIFIED:".$start_date->format('Ymd\THis\Z');
+		$components[] = "UID:{$uid}";
+		$components[] = "CREATED:{$created_date->format('Ymd\THis\Z')}";
+		$components[] = "DTSTAMP:{$start_date->format('Ymd\THis\Z')}";
+		$components[] = "DTSTART:{$start_date->format('Ymd\THis\Z')}";
+		$components[] = "DTEND:{$end_date->format('Ymd\THis\Z')}";
+		$components[] = "DESCRIPTION:{$event['description']}";		//WARNING: exchange server will use the mail body for the calendar body, whereas direct clients will use the $event['description']
+		$components[] = "SUMMARY:{$event['subject']}";
+		$components[] = "LOCATION:{$event['location']}";
+		$components[] = "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN={$event['email']};RSVP=TRUE:mailto:{$event['email']}";		
+		$components[] = "LAST-MODIFIED:{$start_date->format('Ymd\THis\Z')}";
 		$components[] = "PRIORITY:5";
-		$components[] = "SEQUENCE:0";
-		$components[] = "STATUS:CONFIRMED";
+		$components[] = "SEQUENCE:{$event['sequence']}";
+		$components[] = "STATUS:{$status}";
 		$components[] = "TRANSP:TRANSPARENT";		
 		$components[] = "END:VEVENT";
 		$components[] = "END:VCALENDAR";

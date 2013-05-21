@@ -323,7 +323,7 @@
 			{if $smarty.get.forum}
 	        	{capture name = 'subforums_list_code'}
 	            	{foreach name = "subforums_list" item = "subforum" key = "key2" from = $T_FORUMS}
-	                	{if $subforum.parent_id == $T_FORUMS.$current_forum.id && $subforum.status != '3'}
+	                	{if $subforum.parent_id == $T_FORUMS.$current_forum.id && ($subforum.status != '3' || $smarty.session.s_type == 'administrator')}
 	                    	{assign var = "has_subforums" value = true}
 	                                        <tr class = "{cycle name = $key values = "oddRowColor,evenRowColor"}">
 	                                            <td>
@@ -485,7 +485,7 @@
 
 							{/if}
 	                            </table>
-<!--/ajax:topicsTable-->	                            
+<!--/ajax:topicsTable-->	                           
 	                {/if}
 
 	            {else}

@@ -729,34 +729,6 @@ var quickformSkillQuestCount  	= '{$T_QUICKTEST_FORM.skill_questions_count_row.h
 	    <tr><td id = "singleColumn">
 	    {if $smarty.get.print}
 	    <p style = "text-align:center"><input id = "print_button" class = "flatButton" type = "submit" onClick = "$('print_button').hide();window.print()" value = "{$smarty.const._PRINTIT}"/></p>
-						
-		    {literal}
-		    <style>.rawTextQuestion {width:100%;height:400px;}/*For print version, display larger textareas*/</style>
-			<script>
-				// Function for printing in IE6
-				// Opens a new popup, set its innerHTML like the content we want to print
-				// then calls window.print and then closes the popup without the user knowing
-				function printPartOfPage(elementId)
-				{
-				    var printContent = document.getElementById(elementId);
-				    var windowUrl = 'about:blank';
-				    var uniqueName = new Date();
-				    var windowName = 'Print' + uniqueName.getTime();
-				    var printWindow = window.open(windowUrl, windowName, 'left=350,top=200,width=1,height=1,z-lock=yes');
-				    printWindow.document.write("<link rel = \"stylesheet\" type = \"text/css\" href = \"css/css_global.php\" />");
-				    printWindow.document.write(printContent.innerHTML);
-				    printWindow.document.close();
-				    printWindow.focus();
-				    printWindow.print();
-				    printWindow.close();
-				}
-			</script>
-			{/literal}
-	    <!--    <table style = "width:100%;">
-	            <tr><td style = "padding-top:10px;padding-bottom:15px;text-align:center">
-	                <input class = "flatButton" type = "submit" onClick = "printPartOfPage('shown_test');" value = "{$smarty.const._PRINTIT}"/>
-	            </td></tr>
-	        </table> -->
 	    {/if}
 	    {$T_TEST_UNSOLVED}
 	    </td></tr>
