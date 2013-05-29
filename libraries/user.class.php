@@ -250,26 +250,7 @@ abstract class EfrontUser
 	 * @access public
 	 */
 	public static function createUser($userProperties, $users = array(), $addToDefaultGroup = true) {
-/*		
-		if (empty($users)) {
-			$users = eF_getTableDataFlat("users", "login, active, archive");
-		}	
-		foreach ($users['login'] as $key=>$value) {
-			$users['login'][$key] = mb_strtolower($value);		//make it lower, so when, later on, we're comparing the user with existing, we can do a case-insensitive match
-		}		
-		
-		$archived = array_combine($users['login'], $users['archive']);	
-		foreach ($archived as $key => $value) {
-			if (!$value) {
-				unset($archived[$key]);
-			} 
-		}
-		
-		//$archived = array_filter($archived, create_function('$v', 'return $v;'));
-		$users = array_combine($users['login'], $users['active']);	
-*/		
-		//$activatedUsers = array_sum($users); //not taking into account deactivated users in license users count		
-		$result = eF_getTableData("users", "count(id) as total");
+		$result = eF_getTableData("users", "count(id) as total", "active=1");
 		$activatedUsers = $result[0]['total'];
 		
 		if (!isset($userProperties['login']) || !eF_checkParameter($userProperties['login'], 'login')) {
@@ -301,6 +282,7 @@ abstract class EfrontUser
 		
 		if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
 			if (G_VERSIONTYPE != 'standard') { #cpp#ifndef STANDARD
+			pr($activatedUsers);
 				if (isset($GLOBALS['configuration']['version_users']) && $activatedUsers > $GLOBALS['configuration']['version_users'] && $GLOBALS['configuration']['version_users'] > 0) {
 					throw new EfrontUserException(_MAXIMUMUSERSNUMBERREACHED.' ('.$GLOBALS['configuration']['version_users'].'): '.$userProperties['login'], EfrontUserException :: MAXIMUM_REACHED);
 				}

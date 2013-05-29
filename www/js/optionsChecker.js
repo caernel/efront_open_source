@@ -11,7 +11,7 @@
 		optionsChecker.checkCookies = 1;
 		optionsChecker.checkJava = 1;
 		//set valid clients in an array (values are: IE6|IE7|IE8|IE9|Firefox 3|Firefox 4|Chrome 5|Safari 5|Firefox|Chrome|Safari)
-		optionsChecker.validClients = ["IE7","IE8","Firefox","Chrome","Safari", "IE9"];		
+		optionsChecker.validClients = ["IE7","IE8","Firefox","Chrome","Safari", "IE9", "IE10"];		
 		optionsChecker.screenRes = {};
 		optionsChecker.screenRes.minWidth = 1024;
 		optionsChecker.screenRes.minHeight = 768;
@@ -66,6 +66,9 @@
 				case "IE9":
 					optionsChecker.supportedClients[10] = /MSIE 9/g;
 					break;
+				case "IE10":
+					optionsChecker.supportedClients[10] = /MSIE 10/g;
+					break;	
 			}
 		}
 		

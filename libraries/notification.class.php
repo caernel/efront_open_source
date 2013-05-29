@@ -168,6 +168,7 @@ class EfrontNotification
 	    $predefined_events = array(EfrontEvent::SYSTEM_FORGOTTEN_PASSWORD,
 	    						   EfrontEvent::SYSTEM_NEW_PASSWORD_REQUEST,
 	    						   EfrontEvent::SYSTEM_ON_EMAIL_ACTIVATION,
+	    						   EfrontEvent::SYSTEM_ON_ADMIN_ACTIVATION,
 	    						   EfrontEvent::SYSTEM_REGISTER,
 	    						   EfrontEvent::NEW_SURVEY,
 	    						   EfrontEvent::NEW_SYSTEM_ANNOUNCEMENT,
@@ -221,6 +222,7 @@ class EfrontNotification
 												               _FORFURTHERCONTACTADMINAT." ###host_name###/index.php?ctg=contact <br><br>"._KINDREGARDSEFRONT."<br>---<br>"._ADMINISTRATIONGROUP."<br>###site_name###<br>###site_motto###<br>");
 			eF_insertTableData("event_notifications", $default_notification);
 		}
+		
 
 	    if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
 			$supervisor_registr = eF_getTableDataFlat("event_notifications", "event_type", "event_type = " . EfrontEvent::HCD_NEW_JOB_ASSIGNMENT . " AND send_recipients = " . EfrontNotification::EXPLICITLYSEL);

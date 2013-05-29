@@ -255,7 +255,7 @@ $loadScripts[] = 'includes/groups';
             			eF_deleteTableData("courses_to_groups", "groups_ID=".$_GET['edit_user_group']);
             			echo "All lessons where deleted from group";
             		} else if (isset($_GET['assign_to_all_users']) && $_GET['assign_to_all_users'] == "courses") {
-            			$groupUsers   = $currentGroup -> getGroupUsers();				
+            			$groupUsers   = $currentGroup -> getGroupUsers();
             			if ($currentGroup -> group['user_types_ID'] == '0') {
             				foreach ($groupUsers as $key => $user) {
             					if ($user -> user['user_type'] == 'administrator') {
@@ -278,15 +278,15 @@ $loadScripts[] = 'includes/groups';
     						$groupUsers_  = $groupUsers; // because unset was done wrongly for all courses(#2808)
             				$coursetypes = $userRoles;			
             				foreach ($groupUsers_ as $login => $user) {
-		            			$index = array_search($login, array_keys($usersTocourses[$key]));
-            					if ($index !== false) {
+            					
+            					if (isset($usersTocourses[$key][$login])) {
             						unset($groupUsers_[$login]);
             						if (is_array($coursetypes)) {
             							unset($coursetypes[$login]);
             						}
             					}
             				}
-            	
+            				
       						if (!empty($groupUsers_))	{			
             					$course -> addUsers($groupUsers_, $coursetypes, true);
       						}

@@ -847,6 +847,18 @@ class EfrontSystem
 			
 		}
 	}
+	
+	public static function getSpaceUsage() {
+		$total_size = $total_files= 0;
+		$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(G_ROOTPATH), RecursiveIteratorIterator::SELF_FIRST);
+    	foreach($objects as $name => $object){
+    		if ($object->isFile()) {
+    			$total_size +=$object->getSize();
+    			$total_files ++;
+    		}
+    	}
+		return array(round($total_size/(1024*1024)), $total_files);
+	}
 }
 
 

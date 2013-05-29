@@ -147,7 +147,7 @@ function applyOperation(el, operation) {
 }
 function onApplyOperation(el, response) {
 	if (response.evalJSON(true).table_name) {
-		eF_js_showDivPopup(event, '', '', response.evalJSON(true).table_name);
+		eF_js_showDivPopup();
 	}
 	eF_js_redrawPage('usersTable', true);
 }

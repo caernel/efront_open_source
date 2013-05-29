@@ -298,7 +298,7 @@
 <table id = "popup_table" class = "divPopup" style = "display:none;">
     <tr class = "defaultRowHeight">
         <td class = "topTitle" id = "popup_title"></td>
-        <td class = "topTitle" style = "width:1%;"><img src = "images/16x16/close.png" alt = "Close" name = "" id = "popup_close" title = "Close" onclick = "eF_js_showDivPopup(event, '', '', this.name)"/>
+        <td class = "topTitle" style = "width:1%;"><img src = "images/16x16/close.png" alt = "Close" name = "" id = "popup_close" title = "Close" onclick = "eF_js_showDivPopup()"/>
     </td></tr>
     <tr><td colspan = "2" id = "popup_data" style = "vertical-align:top;"></td></tr>
     <tr><td colspan = "2" id = "frame_data" style = "width:100%;height:100%">

@@ -2633,7 +2633,7 @@ class EfrontCourse
 											<span class = "listName">'.$this -> course['name'].'</span>
 										</a>';
 				} else {
-					$options['courses_link'] ? $courseString .= '<a href = "'.$coursesLink.'">'.$courseString .= $this -> course['name'].'</a>' : $courseString .= $this -> course['name'];
+					$options['courses_link'] ? $courseString .= '<a href = "'.$coursesLink.'">'.$this -> course['name'].'</a>' : $courseString .= $this -> course['name'];
 				}
 			} else {
 				$courseString .= $this -> course['name'];
@@ -3692,7 +3692,7 @@ class EfrontCourse
 				$where[] = $constraint['condition'];
 			}
 		}
-		if (isset($constraints['branch_url']) && defined('G_BRANCH_URL')) {
+		if (isset($constraints['branch_url']) && defined('G_BRANCH_URL') && G_BRANCH_URL) {
 			$tree = new EfrontBranchesTree();
 			$iterator = new EfrontNodeFilterIterator(new RecursiveIteratorIterator(new RecursiveArrayIterator($tree->getNodeChildren($_SESSION['s_current_branch'])), RecursiveIteratorIterator :: SELF_FIRST));
 			$subbranches[] = $_SESSION['s_current_branch'];

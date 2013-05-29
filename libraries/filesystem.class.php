@@ -1987,7 +1987,7 @@ class FileSystemTree extends EfrontTree
             if ($uploadForm -> isSubmitted() && $uploadForm -> validate()) {
                 $uploadedFile = $this -> handleUploadForm($uploadForm);
                 $uploadFormString .= '
-                	  <script>if (window.name == "POPUP_FRAME") {(parent.eF_js_showDivPopup(event, "", "", "upload_file_table_'.$tableId.'"));parent.eF_js_rebuildTable(parent.$(\'filename_'.$tableId.'\').down().getAttribute(\'tableIndex\'), 0, \'\', \'desc\', \''.urlencode($currentDirectory).'\');parent.$(\'uploading_image\').hide()}</script>';
+                	  <script>if (window.name == "POPUP_FRAME") {(parent.eF_js_showDivPopup());parent.eF_js_rebuildTable(parent.$(\'filename_'.$tableId.'\').down().getAttribute(\'tableIndex\'), 0, \'\', \'desc\', \''.urlencode($currentDirectory).'\');parent.$(\'uploading_image\').hide()}</script>';
             }
 
             $createFolderForm   = new HTML_QuickForm("create_folder_form", "post", $url, "", "target = 'POPUP_FRAME'", true);
@@ -1995,7 +1995,7 @@ class FileSystemTree extends EfrontTree
             if ($createFolderForm -> isSubmitted() && $createFolderForm -> validate()) {
                 $this -> handleCreateDirectoryForm($createFolderForm);
                 $createFolderString .= '
-                	  <script>if (window.name == "POPUP_FRAME") {(parent.eF_js_showDivPopup(event, "", "", "create_directory_table_'.$tableId.'"));parent.eF_js_rebuildTable(parent.$(\'filename_'.$tableId.'\').down().getAttribute(\'tableIndex\'), 0, \'\', \'desc\', \''.urlencode($currentDirectory).'\');}</script>';
+                	  <script>if (window.name == "POPUP_FRAME") {(parent.eF_js_showDivPopup());parent.eF_js_rebuildTable(parent.$(\'filename_'.$tableId.'\').down().getAttribute(\'tableIndex\'), 0, \'\', \'desc\', \''.urlencode($currentDirectory).'\');}</script>';
             }
             /*
              $copyForm       = new HTML_QuickForm("copy_file_form", "post", $url, "", "", true);

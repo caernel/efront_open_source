@@ -89,7 +89,7 @@ if (version_compare($dbVersion, '3.6.13') == -1) {
 	
 	try {
 		//change all tables' engine to innodb, except for these containing a fulltext index, which don't support innodb
-		$result = $db->getCol("SELECT CONCAT('ALTER TABLE ',table_schema,'.',table_name,' ENGINE=InnoDB;') FROM information_schema.tables WHERE engine='MyISAM' AND table_schema='{$db->database}' AND  table_name not in (select table_name FROM information_schema.statistics WHERE index_type='FULLTEXT' and table_schema='{$db->database}')");
+		$result = $db->getCol("SELECT CONCAT('ALTER TABLE `',table_schema,'`.`',table_name,'` ENGINE=InnoDB;') FROM information_schema.tables WHERE engine='MyISAM' AND table_schema='{$db->database}' AND  table_name not in (select table_name FROM information_schema.statistics WHERE index_type='FULLTEXT' and table_schema='{$db->database}')");
 		foreach ($result as $value) {
 			$db->Execute($value);
 		}

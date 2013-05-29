@@ -1,6 +1,9 @@
-/**
- * Used in scorm, among other places
- */
+Event.observe(document.body, 'click', function(e) {
+		if (typeof(window.event) == 'undefined') {
+			window.event = e;
+		}
+	});
+
 function findFrame(win, frame_name) {
 	if (win.name == frame_name) {
 		return win;
@@ -14,9 +17,9 @@ function findFrame(win, frame_name) {
 }
 
 function eF_js_showDivPopup(e, popup_title, size, popup_data_id) {
-	var sizes = [new Array('600px', '400px'), new Array('680px', '450px'), new Array('760px', '580px'), new Array('800px', '630px'), new Array('940px', '650px')];
-	var target = e.target || e.srcElement;
 	if (popup_title) {
+		var sizes = [new Array('600px', '400px'), new Array('680px', '450px'), new Array('760px', '580px'), new Array('800px', '630px'), new Array('940px', '650px')];
+		var target = e.target || e.srcElement;
 		jQuery.fn.efront('modal', {'header':popup_title, 'id':popup_data_id, width:sizes[size][0], height:sizes[size][1], 'element' :target});
 	} else {
 		jQuery('#ef-modal').modal('hide').remove();

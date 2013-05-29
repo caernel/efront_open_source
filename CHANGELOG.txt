@@ -1,3 +1,11 @@
+=== Version 3.6.13.3 - build  ===
+- Fixed wrong calculation of users limit (Commercial editions)
+- Added total space and files used from the installation under system reports
+- Users that are created from a supervisor are now placed in the supervisor's topmost branch
+- Corrupted tests can now be deleted
+- Fixed group courses assign to users for PHP version 5.3+
+- Fixed firefox not closing popups when returning from ajax functions
+
 === Version 3.6.13.2 - build 18005 ===
 - Added ability to import users-to-lessons assignments from CSV file
 - Added ability for a module to restrict access to a course

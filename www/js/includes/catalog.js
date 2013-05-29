@@ -28,7 +28,7 @@ function onUpdateCoupon(el, response) {
 			$('free_registration_hidden').show();
 			$('submit_checkout_paypal').hide();
 		}
-		eF_js_showDivPopup(event, '', '', 'coupon_table');
+		eF_js_showDivPopup();
 	} catch (e) {alert(e);}
 }
 

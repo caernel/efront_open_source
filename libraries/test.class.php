@@ -1161,14 +1161,10 @@ class EfrontTest
         	if (!eF_checkParameter($instance, 'id')) {
         		throw new EfrontTestException(_INVALIDID.': '.$instance, EfrontTestException :: INVALID_ID);
         	}
-        	$result = EfrontCompletedTest::retrieveCompletedTest("completed_tests ct join completed_tests_blob ctb on ct.id=ctb.completed_tests_ID", "ct.*,ctb.test", "users_LOGIN='".$login."' and ct.id = ".$instance);
+        	$result = EfrontCompletedTest::retrieveCompletedTest("completed_tests ct", "ct.*", "users_LOGIN='".$login."' and ct.id = ".$instance);
 
         	if (sizeof($result) == 0) {
         		throw new EfrontTestException(_USERHASNOTDONETEST.': '.$login, EfrontTestException :: NOT_DONE_TEST);
-        	}
-        	$completedTest = unserialize($result[0]['test']);
-        	if (!$completedTest) {
-        		throw new EfrontTestException(_TESTCORRUPTEDORNOTACOMPLETEDTEST, EfrontTestException::CORRUPTED_TEST);
         	}
 	        if (is_dir(G_UPLOADPATH.$login.'/tests/'.$instance)) {
 	            try {
@@ -1179,7 +1175,7 @@ class EfrontTest
 
 	        //If the test is the last one (the 'active'), set it as not seen.
 	        //If it doesn't have a content id, it is a skill-gap test
-	        if ($completedTest -> completedTest['archive'] == 0 && $this -> test['content_ID']) {
+	        if ($result[0]['archive'] == 0 && $this -> test['content_ID']) {
 	        	if (!($user instanceof EfrontUser)) {
 	        		$user = EfrontUserFactory :: factory($login, false, 'student');
 	        	}

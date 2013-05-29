@@ -50,7 +50,7 @@ $$('div.block').ancestors().each(function (s) {
 <table id = "popup_table" class = "divPopup" style = "display:none;">
     <tr class = "defaultRowHeight">
         <td class = "topTitle" id = "popup_title"></td>
-        <td class = "topTitle" id = "popup_close_cell"><img src = "images/16x16/close.png" alt = "{$smarty.const._CLOSE}" name = "" id = "popup_close" title = "{$smarty.const._CLOSE}" onclick = "if (document.getElementById('reloadHidden') && document.getElementById('reloadHidden').value == '1')  {ldelim}parent.frames[1].location = parent.frames[1].location{rdelim};eF_js_showDivPopup(event, '', '', this.name);"/>
+        <td class = "topTitle" id = "popup_close_cell"><img src = "images/16x16/close.png" alt = "{$smarty.const._CLOSE}" name = "" id = "popup_close" title = "{$smarty.const._CLOSE}" onclick = "if (document.getElementById('reloadHidden') && document.getElementById('reloadHidden').value == '1')  {ldelim}parent.frames[1].location = parent.frames[1].location{rdelim};eF_js_showDivPopup();"/>
     </td></tr>
     <tr><td colspan = "2" id = "popup_data" style = ""></td></tr>
     <tr><td colspan = "2" id = "frame_data" style = "display:none;">

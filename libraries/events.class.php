@@ -66,6 +66,7 @@ class EfrontEvent
     const SYSTEM_ON_EMAIL_ACTIVATION = 6;		 // entity_name (=timestamp of activation email sending)
     const SYSTEM_NEW_PASSWORD_REQUEST = 7;		 // entity_name (=new password) ?extra-security-needed?
 	const SYSTEM_USER_DEACTIVATE = 8;
+	const SYSTEM_ON_ADMIN_ACTIVATION = 9;
 
 	// Lesson codes: [25 - 49]
     const LESSON_ACQUISITION_AS_STUDENT = 25;    // users_LOGIN, lessons_ID, lessons_name
@@ -231,7 +232,8 @@ class EfrontEvent
    							   EfrontEvent::SYSTEM_NEW_PASSWORD_REQUEST => array("text" => _SYSTEM_ON_NEW_PASSWORD_REQUEST, "category" => "system"),
    							   EfrontEvent::SYSTEM_REGISTER => array("text" => _SYSTEM_REGISTERED, "category" => "system"),
    							   EfrontEvent::SYSTEM_ON_EMAIL_ACTIVATION => array("text" => _SYSTEM_EMAIL_ACTIVATION, "category" => "system"),
-							   EfrontEvent::SYSTEM_USER_DEACTIVATE => array("text" => _SYSTEM_USER_DEACTIVATED, "category" => "system"),
+   							   EfrontEvent::SYSTEM_ON_ADMIN_ACTIVATION => array("text" => _SUPERVISORMAILUSERACTIVATION, "category" => "system"),   					
+   							   EfrontEvent::SYSTEM_USER_DEACTIVATE => array("text" => _SYSTEM_USER_DEACTIVATED, "category" => "system"),
 
    							   EfrontEvent::LESSON_ACQUISITION_AS_STUDENT => array("text" => _LESSON_ACQUISITION_AS_STUDENT, "category" => "lessons", "priority" => 1, "afterEvent" => 1),
    							   EfrontEvent::LESSON_ACQUISITION_AS_PROFESSOR => array("text" => _LESSON_ACQUISITION_AS_PROFESSOR, "category" => "lessons", "priority" => 1, "afterEvent" => 1),
@@ -1143,6 +1145,8 @@ class EfrontEvent
 				$this -> event['message'] .=  _WASREGISTEREDINTOTHESYSTEM;
 			}  else if ($this -> event['type'] == EfrontEvent::SYSTEM_ON_EMAIL_ACTIVATION) {
 				$this -> event['message'] .=  _ACTIVATEDHISACCOUNTWITHEACTIVATIONMAIL;
+			}  else if ($this -> event['type'] == EfrontEvent::SYSTEM_ON_ADMIN_ACTIVATION) {
+				$this -> event['message'] .=  _ACTIVATEDACCOUNTFROMSUPERVISOR;
 			}  else if ($this -> event['type'] == EfrontEvent::SYSTEM_USER_DEACTIVATE) {
 				$this -> event['message'] .=  _WASDEACTIVATEDFROMTHESYSTEM;
 	        // For courses we have lessons_name -> courses_name

@@ -259,7 +259,14 @@ if ($form -> isSubmitted() && $form -> validate()) {
 			//EfrontEvent::triggerEvent(array("type" => (-1) * EfrontEvent::SYSTEM_VISITED, "users_LOGIN" => $userProperties['login'], "users_name" => $userProperties['name'], "users_surname" => $userProperties['surname']));
 		} else {
 			unset($userProperties['timestamp']);
-			!$editedUser->user['pending'] OR $editedUser->user['pending'] = !$userProperties['active'];		//If the user was pending, then set his status as the opposite of 			
+			
+			//!$editedUser->user['pending'] OR $editedUser->user['pending'] = !$userProperties['active'];		//If the user was pending, then set his status as the opposite of 			
+			if ($editedUser->user['pending']) {
+				$editedUser->user['pending'] = !$userProperties['active'];
+				EfrontEvent::triggerEvent(array("type" => EfrontEvent::SYSTEM_ON_ADMIN_ACTIVATION, "users_LOGIN" => $editedUser->user['login'], "users_name" => $editedUser->user['name'], "users_surname" => $editedUser->user['surname'], "timestamp" => time(), "entity_name" => time()));
+				
+			}
+			
 			foreach ($constrainAccess as $value) {
 				unset($userProperties[$value]);
 			}
@@ -318,7 +325,7 @@ if ($form -> isSubmitted() && $form -> validate()) {
 			if (isset($_GET['add_user'])) {
 				$editedEmployee = EfrontHcdUser :: createUser(array('users_login' => $editedUser->user['login']));
 				if ($currentEmployee -> isSupervisor() && !EfrontUser::isOptionVisible('show_unassigned_users_to_supervisors')) {//if supervisors can't see unassigned users, then attach this new user to the supervisor's firts branch and job
-					$branch = new EfrontBranch(current($currentEmployee -> supervisesBranches));
+					$branch = new EfrontBranch(current($currentEmployee -> getSupervisedBranchesRecursive()));
 					$job = current($branch -> getJobDescriptions());
 					$editedEmployee -> addJob($editedUser, $job['job_description_ID'], $branch->branch['branch_ID'], 0);
 				}
