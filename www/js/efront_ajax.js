@@ -88,3 +88,10 @@ function ajaxRequest(el, url, parameters, callbackSuccess, callbackFailure, asyn
 	
 }
 
+Event.observe(document.body, 'click', function(e) {
+	if (typeof(window.event) == 'undefined') {
+		window.event = e;
+	}
+});
+
+

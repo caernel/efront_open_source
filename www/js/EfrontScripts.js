@@ -1,9 +1,3 @@
-Event.observe(document.body, 'click', function(e) {
-		if (typeof(window.event) == 'undefined') {
-			window.event = e;
-		}
-	});
-
 function findFrame(win, frame_name) {
 	if (win.name == frame_name) {
 		return win;
