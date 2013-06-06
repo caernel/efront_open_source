@@ -157,6 +157,7 @@ class EfrontConfiguration
         'mode_online_users' => self::MODE_VISIBLE,
         'mode_glossary' => self::MODE_VISIBLE,
         'mode_shared_glossary' => self::MODE_INVISIBLE,
+        'mode_test_glossary' => self::MODE_INVISIBLE,
         'mode_calendar' => self::MODE_VISIBLE,
         'mode_surveys' => self::MODE_VISIBLE,
         'mode_news' => self::MODE_VISIBLE,

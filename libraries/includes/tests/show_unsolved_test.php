@@ -219,14 +219,17 @@ if (!$_student_) {
         if ($form -> isSubmitted() && $form -> validate()) {
         	try {
         		$values = $form -> exportValues();
-
         		$submitValues = $form -> getSubmitValues();
 
         		foreach($testInstance -> questions as $id => $question) {
         			$submitValues['question_time'][$id] || $submitValues['question_time'][$id] === 0 ? $question -> time = $submitValues['question_time'][$id] : null;
         		}
-
-        		if (isset($values['pause_test'])) {
+        		
+        		if (isset($_GET['auto_save'])) {
+        			$testInstance -> autoSave($values['question'], $_POST['goto_question']);
+        			//$testInstance -> pause($values['question'], $_POST['goto_question']);
+        			echo json_encode(array('success' => 1));
+        		} else if (isset($values['pause_test'])) {
         			$testInstance -> pause($values['question'], $_POST['goto_question']);
         			eF_redirect("".basename($_SERVER['PHP_SELF'])."?ctg=content&type=tests");
         		} else {

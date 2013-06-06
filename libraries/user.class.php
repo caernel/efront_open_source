@@ -1838,9 +1838,9 @@ abstract class EfrontUser
 		return $userArray;
 	}
 	
-	public static function isOptionVisible($option) {	
+	public static function isOptionVisible($option, $checkLessonMode = true) {	
 		$disableMode = $GLOBALS['configuration']['mode_'.$option];		//this option is not disabled (0)
-		if (is_null($disableMode)) { //in case it is NULL
+		if (is_null($disableMode) || $disableMode) { //in case it is NULL or 1
 			$disableMode = true;
 		}
 		//$simpleMode = !$GLOBALS['configuration']['simple_mode'] || $GLOBALS['configuration']['mode_'.$option] == 1;	//either we're not in simple mode, or this option is allowed in simple mode		
@@ -1856,11 +1856,18 @@ abstract class EfrontUser
 		} else {
 			$coreAccessMode = true;
 		}
-		if (isset($_SESSION['s_lessons_ID']) && isset($GLOBALS['currentLesson']) && ($GLOBALS['currentLesson'] instanceOf EfrontLesson) && $_SESSION['s_type'] != 'administrator' && isset($currentLesson -> options[$option])) {
-			$lessonMode = $currentLesson -> options[$option];
+		if ($checkLessonMode) {
+			if (isset($_SESSION['s_lessons_ID']) && isset($GLOBALS['currentLesson']) && ($GLOBALS['currentLesson'] instanceOf EfrontLesson) && $_SESSION['s_type'] != 'administrator' && isset($GLOBALS['currentLesson'] -> options[$option])) {
+				$lessonMode = $currentLesson -> options[$option];
+				if (is_null($lessonMode) || $lessonMode) { //in case it is NULL or 1
+					$lessonMode = true;
+				}
+			} else {
+				$lessonMode = true;
+			}	
 		} else {
 			$lessonMode = true;
-		}	
+		}			
 		$mode = $simpleMode && $disableMode && $coreAccessMode && $lessonMode;
 		return $mode;
 	}
@@ -2582,7 +2589,7 @@ abstract class EfrontLessonUser extends EfrontUser
 		list($where, $limit, $orderby) = EfrontCourse :: convertCourseConstraintsToSqlParameters($constraints);
 		
 		$from = "courses c left outer join (select id from courses) r on c.id=r.id";
-		if (isset($constraints['branch_url']) && G_BRANCH_URL) {
+		if (isset($constraints['branch_url']) && $_SESSION['s_current_branch']) {
 			$from.= ' LEFT OUTER JOIN module_hcd_course_to_branch cb on cb.courses_ID=c.id';
 		} 
 		//WITH THIS NEW QUERY, WE GET THE SLOW 'has_instances' PROPERTY AFTER FILTERING
@@ -2607,7 +2614,7 @@ abstract class EfrontLessonUser extends EfrontUser
 		list($where, $limit, $orderby) = EfrontCourse :: convertCourseConstraintsToSqlParameters($constraints);
 		//$where[] = "d.id=c.directions_ID";
 		$from = "courses c left outer join (select id from courses) r on c.id=r.id";
-		if (isset($constraints['branch_url']) && G_BRANCH_URL) {
+		if (isset($constraints['branch_url']) && $_SESSION['s_current_branch']) {
 			$from.= ' LEFT OUTER JOIN module_hcd_course_to_branch cb on cb.courses_ID=c.id';
 		}
 		
@@ -3920,7 +3927,9 @@ class EfrontStudent extends EfrontLessonUser
 			$doneContent[$unit] = $unit;
 			$current_unit	   = $unit;
 		} else {
-			unset($doneContent[$unit]);
+			if (isset($doneContent[$unit])) { //Because of Fatal error: Cannot unset string offsets error
+				unset($doneContent[$unit]); 
+			}
 			if ($unit == $result[0]['current_unit']) {
 				sizeof($doneContent) ? $current_unit = end($doneContent) : $current_unit = 0;
 			}

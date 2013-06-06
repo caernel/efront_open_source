@@ -121,8 +121,7 @@ if (!isset($_GET['checkout'])) {
 	if (isset($_SESSION['s_current_branch'])) {
 		$branch = new EfrontBranch($_SESSION['s_current_branch']);
 		$constraints = array('active' => true, 'archive' => false, 'instance' => false, 'sort' => 'name');
-		$courses = $branch->getBranchCoursesIncludingSubbranches($constraints);
-		
+		$courses = $branch->getBranchCoursesIncludingParentBranches($constraints);
 		$lessons = array();
 	}
 	

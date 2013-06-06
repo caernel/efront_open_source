@@ -202,7 +202,7 @@ if (!$smarty -> is_cached('index.tpl', $cacheId) || !$GLOBALS['configuration']['
 	if (isset($_SESSION['s_current_branch'])) {
 		$branch = new EfrontBranch($_SESSION['s_current_branch']);
 		$constraints = array('active' => true, 'archive' => false, 'instance' => false, 'sort' => 'name');
-		$courses = $branch->getBranchCourses($constraints);
+		$courses = $branch->getBranchCoursesIncludingParentBranches($constraints);
 	
 		$lessons = array();
 	}	
@@ -337,9 +337,9 @@ if ($form -> isSubmitted() && $form -> validate()) {
 		$user -> login($form -> exportValue('password'));
 		
 		//Check whether there are any fields that must be filled in by the user
-		$result = eF_getTableData("user_profile", "name", "active=1 and mandatory = 2");
+		$result = eF_getTableData("user_profile", "name,type", "active=1 and mandatory = 2");
 		foreach ($result as $value) {
-			if ($user -> user[$value['name']] == '' || is_null($user -> user[$value['name']])) {
+			if (($user -> user[$value['name']] == '' || is_null($user -> user[$value['name']])) && $value['type'] != 'branchinfo') {
 				$_SESSION['missing_fields'] = 1;
 			}
 		}

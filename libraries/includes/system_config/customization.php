@@ -36,7 +36,7 @@ if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
 $modeForm -> addElement("select", "mode_user_profile",  _CUSTOMIZEUSERSPROFILE, $modes);
 $modeForm -> addElement("select", "mode_feedback",  _FEEDBACK, $modes);
 $modeForm -> addElement("select", "mode_forum",  _FORUMS, $modes);
-$modeForm -> addElement("select", "mode_glossary",  _GLOSSARY, $modes, 'onChange="checkDependency(this.options[this.options.selectedIndex].value, \'shared_glossary\')"');
+$modeForm -> addElement("select", "mode_glossary",  _GLOSSARY, $modes, 'onChange="checkDependency(this.options[this.options.selectedIndex].value, \'shared_glossary\')";checkDependency(this.options[this.options.selectedIndex].value, \'test_glossary\')"');
 $modeForm -> addElement("select", "mode_groups",  _GROUPS, $modes);
 $modeForm -> addElement("select", "mode_help",  _HELP, $modes);
 $modeForm -> addElement("select", "mode_languages",  _LANGUAGES, $modes);
@@ -70,6 +70,10 @@ $modeForm -> addElement("static", "separator", '<span style="font-weight:bold">'
 $modeForm -> addElement("select", "mode_online_users",  _SHOWONLINEUSERS, $modes, 'onChange="checkDependency(this.options[this.options.selectedIndex].value, \'logout_user\')"');
 $modeForm -> addElement("static", "sidenote", '<span class = "infoCell">'._DEPENDSON.' '._GLOSSARY.'</span>');
 $modeForm -> addElement("select", "mode_shared_glossary",  _SHAREDGLOSSARY, $modes, "id='shared_glossary'");//@todo
+
+$modeForm -> addElement("static", "sidenote", '<span class = "infoCell">'._DEPENDSON.' '._GLOSSARY.'</span>');
+$modeForm -> addElement("select", "mode_test_glossary",  _TESTGLOSSARY, $modes, "id='test_glossary'");//@todo
+
 $modeForm -> addElement("static", "sidenote", '<span class = "infoCell">'._DEPENDSON.' '._MESSAGES.'</span>');
 $modeForm -> addElement("select", "mode_messages_student",  _MESSAGESSTUDENTS, $modes, "id='messages_student'");//@todo
 if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY

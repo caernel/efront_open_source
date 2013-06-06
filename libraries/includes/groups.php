@@ -52,7 +52,9 @@ $loadScripts[] = 'includes/groups';
         if (isset($_GET['edit_user_group'])) {
         	$currentGroup = new EfrontGroup($_GET['edit_user_group']);
         	$smarty -> assign("T_CURRENT_GROUP", $currentGroup);
-			$smarty -> assign ("T_STATS_LINK", array(array('text' => _STATISTICS, 'image' => "16x16/reports.png", 'href' => basename($_SERVER['PHP_SELF'])."?ctg=statistics&option=groups&sel_group=" . $_GET['edit_user_group'], 'target' => '_self')));
+			if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
+				$smarty -> assign ("T_STATS_LINK", array(array('text' => _STATISTICS, 'image' => "16x16/reports.png", 'href' => basename($_SERVER['PHP_SELF'])."?ctg=statistics&option=groups&sel_group=" . $_GET['edit_user_group'], 'target' => '_self')));
+	        } #cpp#endif
 	        if ($currentGroup -> group['key_max_usage'] > 0) {
 	        	$remainingKeyUsagesLabel = '('._REMAINING.' '.($currentGroup -> group['key_max_usage'] - $currentGroup -> group['key_current_usage']).'/'.$currentGroup -> group['key_max_usage'].')';
 	        }

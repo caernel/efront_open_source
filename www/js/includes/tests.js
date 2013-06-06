@@ -935,3 +935,10 @@ function startAutoCompleter(el, id, options) {
 	autocompleter.activate();
 }
 
+jQuery('div[id*=question_]').on('click', function(event) {
+	//var url = jQuery(this).parents('form').attr('action');
+	jQuery.post(jQuery(this).parents('form').attr('action')+'&auto_save=1', jQuery(this).parents('form').serialize());
+	event.stopPropagation();
+});
+
+

@@ -24,6 +24,14 @@ try {
 
 	$forums		= f_forums :: getAll("f_forums");	
  	$lessons = EFrontLesson :: getLessons(false,true);
+ 	$res = eF_getTableData("lessons", "id,options");
+ 	foreach ($res as $value) {
+ 		$options = unserialize($value['options']);
+ 		if (!$options['forum']) {
+ 			unset($forums[$value['id']]);
+ 		}
+ 	}
+ 	
     if (!$_admin_) {
         $userLessons = $currentUser -> getEligibleLessons();
         foreach ($forums as $key => $value) {

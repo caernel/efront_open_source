@@ -137,7 +137,7 @@ try {
         }
 
         //Professor and student common blocks
-        if ($_professor_ || $_student_) {
+        if ($_professor_ || $_student_) {  	
             //Projects block
             if ($currentLesson -> options['projects'] && EfrontUser::isOptionVisible('projects')) {
                 if ($_professor_) {
@@ -163,7 +163,7 @@ try {
             }
 
             //New forum messages block
-            if (EfrontUser::isOptionVisible('forum')) {
+            if (EfrontUser::isOptionVisible('forum')) {    	
                 //changed  l.name as show_lessons_name to l.name as lessons_name
             	if ($_SESSION['s_type'] != 'administrator' && $_SESSION['s_current_branch']) {	//this applies to supervisors only
             		$forum_messages   = eF_getTableData("module_hcd_employee_works_at_branch ewb, f_messages fm JOIN f_topics ft JOIN f_forums ff LEFT OUTER JOIN lessons l ON ff.lessons_ID = l.id", "fm.title, fm.id, ft.id as topic_id, fm.users_LOGIN, fm.timestamp, l.name as lessons_name, lessons_id as show_lessons_id", "ewb.users_login = fm.users_LOGIN and ewb.branch_ID=".$_SESSION['s_current_branch']." and ft.f_forums_ID=ff.id AND fm.f_topics_ID=ft.id AND ff.lessons_ID = '".$currentLesson -> lesson['id']."'", "fm.timestamp desc LIMIT 5");
@@ -501,6 +501,7 @@ try {
             if (EfrontUser::isOptionVisible('maintenance')) {
                 $controlPanelOptions[] = array('text' => _MAINTENANCE, 'image' => "32x32/maintenance.png", 'href' => "administrator.php?ctg=maintenance");
             }
+            
             if (EfrontUser::isOptionVisible('forum')) {
                 $controlPanelOptions[] = array('text' => _FORUM, 'image' => "32x32/forum.png", 'href' => basename($_SERVER['PHP_SELF'])."?ctg=forum");
             }

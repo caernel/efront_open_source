@@ -323,33 +323,33 @@ if ($_GET['op'] == 'reset_lesson') {
 } else {
     $lessonSettings['theory']              = array('text' => _THEORY,            	'image' => "32x32/theory.png",     'onClick' => 'activate(this, \'theory\')',          'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['theory']) && $currentLesson -> options['theory'] ? null : 'inactiveImage');
     $lessonSettings['examples']            = array('text' => _EXAMPLES,          	'image' => "32x32/examples.png",  'onClick' => 'activate(this, \'examples\')',        'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['examples']) && $currentLesson -> options['examples'] ? null : 'inactiveImage');
-    if (EfrontUser::isOptionVisible('projects')) {
+    if (EfrontUser::isOptionVisible('projects', false)) {
         $lessonSettings['projects']        = array('text' => _PROJECTS,          	'image' => "32x32/projects.png",     'onClick' => 'activate(this, \'projects\')',        'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['projects']) && $currentLesson -> options['projects'] ? null : 'inactiveImage');
     }
-    if (EfrontUser::isOptionVisible('tests')) {
+    if (EfrontUser::isOptionVisible('tests', false)) {
         $lessonSettings['tests']           = array('text' => _TESTS,             	'image' => "32x32/tests.png", 'onClick' => 'activate(this, \'tests\')',           'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['tests']) && $currentLesson -> options['tests'] ? null : 'inactiveImage');
     }
     if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
-        if (EfrontUser::isOptionVisible('surveys')) {
+        if (EfrontUser::isOptionVisible('surveys', false)) {
             $lessonSettings['survey']          = array('text' => _SURVEY,            	'image' => "32x32/surveys.png",    'onClick' => 'activate(this, \'survey\')',          'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['survey']) && $currentLesson -> options['survey'] ? null : 'inactiveImage');
         }
     } #cpp#endif
-    if (EfrontUser::isOptionVisible('feedback')) {
+    if (EfrontUser::isOptionVisible('feedback', false)) {
         $lessonSettings['feedback']          = array('text' => _FEEDBACK,            	'image' => "32x32/feedback.png",    'onClick' => 'activate(this, \'feedback\')',          'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['feedback']) && $currentLesson -> options['feedback'] ? null : 'inactiveImage');
     }
 
 	$lessonSettings['rules']               = array('text' => _ACCESSRULES,       	'image' => "32x32/rules.png",       'onClick' => 'activate(this, \'rules\')',           'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['rules']) && $currentLesson -> options['rules'] ? null : 'inactiveImage');
-    if (EfrontUser::isOptionVisible('forum')) {
+    if (EfrontUser::isOptionVisible('forum', false)) {
         $lessonSettings['forum']           = array('text' => _FORUM,             	'image' => "32x32/forum.png",      'onClick' => 'activate(this, \'forum\')',           'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['forum']) && $currentLesson -> options['forum'] ? null : 'inactiveImage');
     }
-    if (EfrontUser::isOptionVisible('comments')) {
+    if (EfrontUser::isOptionVisible('comments', false)) {
         $lessonSettings['comments']        = array('text' => _COMMENTS,          	'image' => "32x32/note.png",          'onClick' => 'activate(this, \'comments\')',        'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['comments']) && $currentLesson -> options['comments'] ? null : 'inactiveImage');
     }
-    if (EfrontUser::isOptionVisible('news')) {
+    if (EfrontUser::isOptionVisible('news', false)) {
         $lessonSettings['news']        = array('text' => _ANNOUNCEMENTS,            'image' => "32x32/announcements.png",          'onClick' => 'activate(this, \'news\')',        'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['news']) && $currentLesson -> options['news'] ? null : 'inactiveImage');
     }
     if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
-        if (EfrontUser::isOptionVisible('lessons_timeline')) {
+        if (EfrontUser::isOptionVisible('lessons_timeline', false)) {
             $lessonSettings['lessons_timeline']= array('text' => _LESSONSTIMELINE,       'image' => "32x32/user_timeline.png", 'onClick' => 'activate(this, \'lessons_timeline\')',   'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['lessons_timeline']) && $currentLesson -> options['lessons_timeline'] ? null : 'inactiveImage');
         }
     } #cpp#endif
@@ -366,16 +366,16 @@ if ($_GET['op'] == 'reset_lesson') {
     if (sizeof(eF_getTableData("files", "id", "shared=".$currentLesson -> lesson['id'])) > 0) {
         $lessonSettings['digital_library'] = array('text' => _SHAREDFILES,        'image' => "32x32/file_explorer.png",          'onClick' => 'activate(this, \'digital_library\')',    'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['digital_library']) && $currentLesson -> options['digital_library'] ? null : 'inactiveImage');
     }
-    if (EfrontUser::isOptionVisible('calendar')) {
+    if (EfrontUser::isOptionVisible('calendar', false)) {
         $lessonSettings['calendar']        = array('text' => _CALENDAR,              'image' => "32x32/calendar.png",           'onClick' => 'activate(this, \'calendar\')',           'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['calendar']) && $currentLesson -> options['calendar'] ? null : 'inactiveImage');
     }
-    if (EfrontUser::isOptionVisible('glossary')) {
+    if (EfrontUser::isOptionVisible('glossary', false)) {
         $lessonSettings['glossary']        = array('text' => _GLOSSARY,              'image' => "32x32/glossary.png",         'onClick' => 'activate(this, \'glossary\')',           'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['glossary']) && $currentLesson -> options['glossary'] ? null : 'inactiveImage');
     }
     $lessonSettings['auto_complete']       = array('text' => _AUTOCOMPLETE,          'image' => "32x32/autocomplete.png",         'onClick' => 'activate(this, \'auto_complete\')',      'title' => _CLICKTOTOGGLE, 'group' => 1, 'class' => isset($currentLesson -> options['auto_complete']) && $currentLesson -> options['auto_complete'] ? null : 'inactiveImage');
     $lessonSettings['content_tree']        = array('text' => _CONTENTTREEFIRSTPAGE,  'image' => "32x32/content_tree.png",          'onClick' => 'activate(this, \'content_tree\')',       'title' => _CLICKTOTOGGLE, 'group' => 1, 'class' => isset($currentLesson -> options['content_tree']) && $currentLesson -> options['content_tree'] ? null : 'inactiveImage');
     $lessonSettings['lesson_info']         = array('text' => _LESSONINFORMATION,     'image' => "32x32/information.png",              'onClick' => 'activate(this, \'lesson_info\')',        'title' => _CLICKTOTOGGLE, 'group' => 2, 'class' => isset($currentLesson -> options['lesson_info']) && $currentLesson -> options['lesson_info'] ? null : 'inactiveImage');
-    if (EfrontUser::isOptionVisible('bookmarks')) {
+    if (EfrontUser::isOptionVisible('bookmarks', false)) {
         $lessonSettings['bookmarking']     = array('text' => _BOOKMARKS,             'image' => "32x32/bookmark.png",           'onClick' => 'activate(this, \'bookmarking\')',        'title' => _CLICKTOTOGGLE, 'group' => 1, 'class' => isset($currentLesson -> options['bookmarking']) && $currentLesson -> options['bookmarking'] ? null : 'inactiveImage');
     }
 

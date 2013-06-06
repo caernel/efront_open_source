@@ -1784,7 +1784,7 @@ class EfrontTest
                         <table class = "doneTestInfo">
                             <tr><td id = "testName">'.$this -> test['name'].'</td></tr>
                             <tr><td>'._NUMOFQUESTIONS.': '.($this -> options['random_pool'] ? min(sizeof($this -> getQuestions()), $this -> options['random_pool']) : sizeof($this -> getQuestions())).'</td></tr>
-                            <tr><td>'.glossary :: applyGlossary($this -> test['description'], $this -> test['lessons_ID']).'</td></tr>
+                            <tr><td>'.(EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($this -> test['description'], $this -> test['lessons_ID']) : $this -> test['description']).'</td></tr>
                         </table>
                     </td></tr>
             </table>';
@@ -1982,6 +1982,27 @@ class EfrontCompletedTest extends EfrontTest
         $this -> save();
     }
 
+    
+    public function autoSave($userAnswers, $currentQuestion = false) {
+    	foreach ($userAnswers as $id => $answer) {
+    		$this -> questions[$id] -> userAnswer = $answer;
+    	}
+    	foreach ($this -> questions as $id => $question) {
+    		if ($question -> question['type'] == 'raw_text') {
+    			$question -> handleQuestionFiles($this -> getDirectory());
+    		}
+    	}
+    
+    	$this -> time['spent'] = $this -> time['spent'] + time() - $this -> time['resume'];        //Add the time passed since the last pause to the total test time
+    	$testInstance -> time['pause']  = 0;
+    	$testInstance -> time['resume'] = time();
+    	 
+    	if ($currentQuestion) {
+    		$this -> currentQuestion = $currentQuestion;
+    	}
+    	$this -> save();
+    }
+    
     /**
      * Complete test
      *
@@ -3108,7 +3129,7 @@ class MultipleOneQuestion extends Question implements iQuestion
 
         $questionString = '
                     <table class = "unsolvedQuestion multipleOneQuestion">
-                        <tr><td>'.glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']).' '.$this -> getCounter().'</td></tr>
+                        <tr><td>'.(EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']) : $this -> question['text']).' '.$this -> getCounter().'</td></tr>
                         <tr><td>';
         foreach ($formArray['question'][$this -> question['id']] as $key => $value) {
             $questionString .= "<br><span class = 'orderedList'>[".($key+1)."]&nbsp;</span>".$value['html'];
@@ -3406,7 +3427,7 @@ class MultipleManyQuestion extends Question implements iQuestion
 
         $questionString = '
                     <table class = "unsolvedQuestion multipleManyQuestion">
-                        <tr><td>'.glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']).' '.$this -> getCounter().'</td></tr>
+                        <tr><td>'.(EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']) : $this -> question['text']).' '.$this -> getCounter().'</td></tr>
                         <tr><td>';
         foreach ($formArray['question'][$this -> question['id']] as $key => $value) {
             $questionString .= "<br><span class = 'orderedList'>[".($key+1)."]&nbsp;</span>".$value['html'];
@@ -3747,7 +3768,7 @@ class TrueFalseQuestion extends Question implements iQuestion
 */
         $questionString = '
                     <table class = "unsolvedQuestion trueFalseQuestion">
-                        <tr><td>'.glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']).' '.$this -> getCounter().'</td></tr>
+                        <tr><td>'.(EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']) : $this -> question['text']).' '.$this -> getCounter().'</td></tr>
                         <tr><td>
                                 '.$formArray['question'][$this -> question['id']][1]['html'].'<br/>
                                 '.$formArray['question'][$this -> question['id']][0]['html'].'
@@ -4041,7 +4062,7 @@ class EmptySpacesQuestion extends Question implements iQuestion
                         <tr><td>';
    
         foreach ($formArray['question'][$this -> question['id']] as $key => $value) {      	
-            $questionString .= glossary :: applyGlossary($value['label'][$key], $this -> question['lessons_ID']).' '.$value['html'];
+            $questionString .= (EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($value['label'][$key], $this -> question['lessons_ID']) : $value['label'][$key]).' '.$value['html'];
         }
         $questionString .= $value['label'][$key + 1].'
                             </td></tr>
@@ -4379,7 +4400,7 @@ class MatchQuestion extends Question implements iQuestion
 */
         $questionString = '
                     <table class = "unsolvedQuestion matchQuestion">
-                        <tr><td>'.glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']).' '.$this -> getCounter().'</td></tr>
+                        <tr><td>'.(EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']) : $this -> question['text']).' '.$this -> getCounter().'</td></tr>
                         <tr><td>';
         foreach ($formArray['question'][$this -> question['id']] as $key => $value) {
             $questionString .= "<span class = 'orderedList'>[".($key + 1)."]&nbsp;</span>".$value['label'][$key].'&nbsp;&rarr;&nbsp;'.$value['html']."<br>";
@@ -4692,7 +4713,7 @@ class RawTextQuestion extends Question implements iQuestion
         
         $questionString = '
                     <table class = "unsolvedQuestion rawTextQuestion">
-                        <tr><td>'.glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']).' '.$this -> getCounter().'</td></tr>
+                        <tr><td>'.(EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']) : $this -> question['text']).' '.$this -> getCounter().'</td></tr>
                         <tr><td>
                                 '.$formArray['question'][$this -> question['id']]['html'].'<div></div>&nbsp;<img id = "add_another_'.$this -> question['id'].'" src = "images/16x16/add.png" alt = "'._ADDANOTHERFILE.'" title = "'._ADDANOTHERFILE.'" style = "'.$style.'" onclick = "addAnotherFile'.$this -> question['id'].'(this)">
                         </td></tr>
@@ -5035,7 +5056,7 @@ class DragDropQuestion extends Question implements iQuestion
 
         $questionString .= '
                     <table class = "unsolvedQuestion dragDropQuestion" style = "width:auto;min-width:300px">
-                        <tr><td colspan = "3">'.glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']).' '.$this -> getCounter().'</td></tr>';
+                        <tr><td colspan = "3">'.(EfrontUser::isOptionVisible('test_glossary') ? glossary :: applyGlossary($this -> question['text'], $this -> question['lessons_ID']) : $this -> question['text']).' '.$this -> getCounter().'</td></tr>';
         foreach ($formArray['question'][$this -> question['id']] as $key => $value) {
         	if ($this->preview_correct) {
         		$label = $formArray['question'][$this -> question['id']][$key]['label'];

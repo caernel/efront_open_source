@@ -100,8 +100,8 @@ class module_idle_users extends EfrontModule {
 		$smarty -> assign("T_IDLE_USER_FORM", $form->toArray());
 
 		try {
-			if ($currentEmployee) {
-				$result = eF_getTableData("(select login,name,surname,active,max(l.timestamp) as last_action from users u left outer join logs l on u.login=l.users_LOGIN where u.archive=0 group by login) r join module_hcd_employee_works_at_branch ewb on ewb.users_login=r.login", "*", "ewb.branch_ID in (".implode(',', $currentEmployee->supervisesBranches).") and r.last_action is null or r.last_action <= ".$_SESSION['timestamp_from']);
+			if ($currentEmployee) {				
+				$result = eF_getTableData("(select login,name,surname,active,max(l.timestamp) as last_action from users u left outer join logs l on u.login=l.users_LOGIN where u.archive=0 group by login) r join module_hcd_employee_works_at_branch ewb on ewb.users_login=r.login", "*", "ewb.branch_ID in (".implode(',', $currentEmployee->supervisesBranches).") and (r.last_action is null or r.last_action <= ".$_SESSION['timestamp_from'].")");
 			} else {
 				$result = eF_getTableData("(select login,name,surname,active,max(l.timestamp) as last_action from users u left outer join logs l on u.login=l.users_LOGIN where u.archive=0 group by login) r", "*", "r.last_action is null or r.last_action <= ".$_SESSION['timestamp_from']);
 			}

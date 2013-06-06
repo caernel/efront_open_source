@@ -184,6 +184,7 @@ if (isset($_SESSION['s_lessons_ID']) && $_SESSION['s_lessons_ID'] && $_GET['ctg'
     $userLessons = $currentUser -> getLessons();
     if (!isset($userLessons[$_SESSION['s_lessons_ID']]) || $roles[$userLessons[$_SESSION['s_lessons_ID']]] != 'student') {
         eF_redirect("student.php?ctg=lessons");    //redirect to student's lessons page
+
         exit;
     }
     try {

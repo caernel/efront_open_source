@@ -3514,14 +3514,18 @@ class EfrontCourse
 
 		//$result = eF_getTableData("courses c", $select, implode(" and ", $where), $orderby, false, $limit);
 		//WITH THIS NEW QUERY, WE GET THE SLOW 'has_instances' PROPERTY AFTER FILTERING
+		$tables = "courses c";
 		$from   = array("courses.*", "t.*");
 		if (in_array('has_instances', array_keys($select))) {
 			unset($select['has_instances']);
 			$from[] = "(select count(id) from courses c1 where c1.instance_source=courses.id and c1.archive=0) as has_instances";
 			$from[] = "(select count(id) from courses c1 where c1.instance_source=courses.id and c1.archive=0 and c1.active=1 and c1.show_catalog=1) as has_instances_show_in_catalog";
 		}
-
-		$sql	= prepareGetTableData("courses c", implode(",", $select), implode(" and ", $where), $orderby, false, $limit);
+		if (isset($constraints['branch_url']) && $_SESSION['s_current_branch']) {
+			$tables.= ' LEFT OUTER JOIN module_hcd_course_to_branch cb on cb.courses_ID=c.id';
+		}
+		
+		$sql	= prepareGetTableData($tables, implode(",", $select), implode(" and ", $where), $orderby, false, $limit);
 		$result = eF_getTableData("courses, ($sql) t", implode(",", $from), "courses.id=t.id");
 		if (!isset($constraints['return_objects']) || $constraints['return_objects'] == true) {
 			return EfrontCourse :: convertDatabaseResultToCourseObjects($result);
@@ -3532,8 +3536,12 @@ class EfrontCourse
 
 	public static function countAllCourses($constraints = array()) {
 		list($where, $limit, $orderby) = EfrontCourse :: convertCourseConstraintsToSqlParameters($constraints);
+		$tables = "courses c";
+		if (isset($constraints['branch_url']) && $_SESSION['s_current_branch']) {
+			$tables.= ' LEFT OUTER JOIN module_hcd_course_to_branch cb on cb.courses_ID=c.id';
+		}
 		//$where[] = "d.id=c.directions_ID";
-		$result = eF_countTableData("courses c", "c.id", implode(" and ", $where));
+		$result = eF_countTableData($tables, "c.id", implode(" and ", $where));
 
 		return $result[0]['count'];
 	}

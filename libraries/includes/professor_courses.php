@@ -14,6 +14,12 @@ if (!EfrontUser::isOptionVisible('professor_courses') || $_SESSION['s_type'] != 
 }
 $smarty -> assign("_change_", $_change_);
 
+if (G_VERSIONTYPE == 'enterprise') {
+	$currentEmployee = $currentUser -> aspects['hcd'];
+	$_SESSION['employee_type'] = $currentEmployee -> getType();
+	require_once "../libraries/module_hcd_tools.php";
+}
+	
 if (isset($_GET['delete_course']) && eF_checkParameter($_GET['delete_course'], 'id')) {
 	try {
 		if (!$_change_) {
@@ -34,10 +40,12 @@ if (isset($_GET['delete_course']) && eF_checkParameter($_GET['delete_course'], '
 			throw new Exception(_UNAUTHORIZEDACCESS);
 		}
 		$course = new Efrontcourse($_GET['archive_course']);
-		if ($course->course['creator_LOGIN'] != $_SESSION['s_login']) {
-			throw new Exception(_UNAUTHORIZEDACCESS); 
+		if ($course->course['creator_LOGIN'] == $_SESSION['s_login'] || (G_VERSIONTYPE == 'enterprise' && $_SESSION['s_current_branch'] && $currentEmployee -> isSupervisor())) {
+			$course -> archive();
+		} else {
+			throw new Exception(_UNAUTHORIZEDACCESS);				
 		}
-		$course -> archive();
+		
 	} catch (Exception $e) {
 	    handleAjaxExceptions($e);
 	}
@@ -48,12 +56,13 @@ if (isset($_GET['delete_course']) && eF_checkParameter($_GET['delete_course'], '
 			throw new Exception(_UNAUTHORIZEDACCESS);
 		}
 		$course = new EfrontCourse($_GET['deactivate_course']);
-		if ($course->course['creator_LOGIN'] != $_SESSION['s_login']) {
+		if ($course->course['creator_LOGIN'] == $_SESSION['s_login'] || (G_VERSIONTYPE == 'enterprise' && $_SESSION['s_current_branch'] && $currentEmployee -> isSupervisor())) {
+			$course -> course['active'] = 0;
+			$course -> persist();
+			echo "0";
+		} else {
 			throw new Exception(_UNAUTHORIZEDACCESS); 
 		}
-		$course -> course['active'] = 0;
-		$course -> persist();
-		echo "0";
 	} catch (Exception $e) {
 	    handleAjaxExceptions($e);
 	}
@@ -64,12 +73,13 @@ if (isset($_GET['delete_course']) && eF_checkParameter($_GET['delete_course'], '
 			throw new Exception(_UNAUTHORIZEDACCESS);
 		}
 		$course = new EfrontCourse($_GET['activate_course']);
-		if ($course->course['creator_LOGIN'] != $_SESSION['s_login']) {
+		if ($course->course['creator_LOGIN'] == $_SESSION['s_login'] || (G_VERSIONTYPE == 'enterprise' && $_SESSION['s_current_branch'] && $currentEmployee -> isSupervisor())) {
+			$course -> course['active'] = 1;
+			$course -> persist();
+			echo "1";
+		} else {
 			throw new Exception(_UNAUTHORIZEDACCESS); 
 		}
-		$course -> course['active'] = 1;
-		$course -> persist();
-		echo "1";
 	} catch (Exception $e) {
 	    handleAjaxExceptions($e);
 	}
@@ -79,7 +89,8 @@ if (isset($_GET['delete_course']) && eF_checkParameter($_GET['delete_course'], '
 else if (isset($_GET['ajax']) && isset($_GET['edit_course']) && $_change_) {
 	try {
 		$editCourse = new EfrontCourse($_GET['edit_course']);
-		if ($editCourse->course['creator_LOGIN'] != $_SESSION['s_login']) {
+		if ($course->course['creator_LOGIN'] == $_SESSION['s_login'] || (G_VERSIONTYPE == 'enterprise' && $_SESSION['s_current_branch'] && $currentEmployee -> isSupervisor())) {
+		} else {
 			throw new Exception(_UNAUTHORIZEDACCESS); 
 		}
 		$smarty -> assign('T_EDIT_COURSE', $editCourse);
@@ -255,11 +266,8 @@ else if (isset($_GET['ajax']) && isset($_GET['edit_course']) && $_change_) {
 	} #cpp#endif
 
 	if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
-		$currentEmployee = $currentUser -> aspects['hcd'];
-		$_SESSION['employee_type'] = $currentEmployee -> getType();
-		require_once "../libraries/module_hcd_tools.php";
 
-		if ($currentEmployee -> getType() == _SUPERVISOR) {
+		if ($currentEmployee -> isSupervisor()) {
 			$branches = $currentEmployee->getBranches('supervisor');
 			if ($_SESSION['s_current_branch']) {
 				$branches[] = $_SESSION['s_current_branch'];
@@ -490,7 +498,13 @@ else if (isset($_GET['ajax']) && isset($_GET['edit_course']) && $_change_) {
 			}
 
 			$constraints['required_fields'] = array('has_instances', 'location', 'num_students', 'num_lessons', 'num_skills');
-			$constraints['condition']= 'c.creator_LOGIN="'.$_SESSION['s_login'].'"';
+						
+			if (G_VERSIONTYPE == 'enterprise' && $_SESSION['s_current_branch'] && $currentEmployee -> isSupervisor()) {
+				$constraints['branch_url'] = true;
+			} else {
+				$constraints['condition']= 'c.creator_LOGIN="'.$_SESSION['s_login'].'"';
+			}
+			
 			//pr($constraints);
 			$courses 	  = EfrontCourse :: getAllCourses($constraints);
 			$totalEntries = EfrontCourse :: countAllCourses($constraints);

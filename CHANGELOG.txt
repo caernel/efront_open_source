@@ -5,6 +5,9 @@
 - Corrupted tests can now be deleted
 - Fixed group courses assign to users for PHP version 5.3+
 - Fixed firefox not closing popups when returning from ajax functions
+- Professor supervisors can now edit their branch's courses
+- Reversed the way that branch courses appear: Now, a subbranch's catalog lists all parent branches' courses, rather than the other way round (which was introduced in 3.6.13)
+- Autosaving tests
 
 === Version 3.6.13.2 - build 18005 ===
 - Added ability to import users-to-lessons assignments from CSV file
