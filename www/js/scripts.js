@@ -56,7 +56,7 @@
 			} else {
 				var href = settings.url;
 			}
-			console.log(href);
+			//console.log(href);
 			$('<iframe src = "'+href+'" frameborder="no"></iframe>')
 			.css({'width':$('#ef-modal').children('.modal-body').width(),'height':$('#ef-modal').children('.modal-body').height()-30})
 			.appendTo('.modal-body');
@@ -81,7 +81,7 @@
 				_show_modal(options);
 				
 				return this;
-			},
+			}
 	};
 	
 	$.fn.efront = function(method) {

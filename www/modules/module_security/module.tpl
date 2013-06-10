@@ -61,6 +61,7 @@
         {$T_SECURITY_FORM.hidden}
         {$T_SECURITY_FORM.submit_recheck.html}
         {$T_SECURITY_FORM.reset_ignore_list.html}
+        {$T_SECURITY_FORM.ignore_changed_all.html}
     </form> 	
 	
 {elseif $smarty.get.type == 'new_files'}
@@ -94,6 +95,7 @@
         {$T_SECURITY_FORM.hidden}
         {$T_SECURITY_FORM.submit_recheck.html}
         {$T_SECURITY_FORM.reset_ignore_list.html}
+        {$T_SECURITY_FORM.ignore_new_all.html}
     </form> 	
 {else}
         	<table style = "width:100%;">

@@ -116,6 +116,7 @@ class module_security extends EfrontModule {
         		
         		$form -> addElement('submit', 'submit_recheck', _MODULE_SECURITY_RECHECKFILES, 'class = "flatButton" ');
         		$form -> addElement('submit', 'reset_ignore_list', _MODULE_SECURITY_RESETIGNORELIST, 'class = "flatButton" ');
+        		$form -> addElement('submit', 'ignore_changed_all', _MODULE_SECURITY_IGNOREALL, 'class = "flatButton" ');
         		break;
         	case 'new_files':
         		list($changed_files, $new_files) = $this->checksumCheck();
@@ -144,6 +145,7 @@ class module_security extends EfrontModule {
         		
         		$form -> addElement('submit', 'submit_recheck', _MODULE_SECURITY_RECHECKFILES, 'class = "flatButton" ');
         		$form -> addElement('submit', 'reset_ignore_list', _MODULE_SECURITY_RESETIGNORELIST, 'class = "flatButton" ');
+        		$form -> addElement('submit', 'ignore_new_all', _MODULE_SECURITY_IGNOREALL, 'class = "flatButton" ');
         		break;
         	default:
         		$smarty->assign("T_SECURITY_FEEDS", $this->getRssFeeds());
@@ -177,7 +179,19 @@ class module_security extends EfrontModule {
         			} catch (Exception $e) {
         				$this->setMessageVar(_MODULE_SECURITY_THELISTISEMTPY, 'failure');
         			}
-        		}
+        		} else if($values['ignore_new_all']) {
+        			list($changed_files, $new_files) = $this->checksumCheck();
+        			foreach ($new_files as $key => $value) {
+        				$this->addToIgnoreList($key);
+        			}
+        			eF_redirect($this -> moduleBaseUrl.'&type=new_files&message='.urlencode(_OPERATIONCOMPLETEDSUCCESSFULLY).'&message_type=success');
+        		} else if($values['ignore_changed_all']) {
+        			list($changed_files, $new_files) = $this->checksumCheck();
+        			foreach ($changed_files as $key => $value) {
+        				$this->addToIgnoreList($key);
+        			}
+        			eF_redirect($this -> moduleBaseUrl.'&type=changed_files&message='.urlencode(_OPERATIONCOMPLETEDSUCCESSFULLY).'&message_type=success');
+        		} 
         	} catch (Exception $e) {
         		$smarty -> assign("T_EXCEPTION_TRACE", $e -> getTraceAsString());
         		$message      = $e -> getMessage().' ('.$e -> getCode().') &nbsp;<a href = "javascript:void(0)" onclick = "eF_js_showDivPopup(event, \''._ERRORDETAILS.'\', 2, \'error_details\')">'._MOREINFO.'</a>';

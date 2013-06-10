@@ -282,7 +282,7 @@ abstract class EfrontUser
 		
 		if (G_VERSIONTYPE != 'community') { #cpp#ifndef COMMUNITY
 			if (G_VERSIONTYPE != 'standard') { #cpp#ifndef STANDARD
-			pr($activatedUsers);
+			//pr($activatedUsers);
 				if (isset($GLOBALS['configuration']['version_users']) && $activatedUsers > $GLOBALS['configuration']['version_users'] && $GLOBALS['configuration']['version_users'] > 0) {
 					throw new EfrontUserException(_MAXIMUMUSERSNUMBERREACHED.' ('.$GLOBALS['configuration']['version_users'].'): '.$userProperties['login'], EfrontUserException :: MAXIMUM_REACHED);
 				}
@@ -1858,7 +1858,7 @@ abstract class EfrontUser
 		}
 		if ($checkLessonMode) {
 			if (isset($_SESSION['s_lessons_ID']) && isset($GLOBALS['currentLesson']) && ($GLOBALS['currentLesson'] instanceOf EfrontLesson) && $_SESSION['s_type'] != 'administrator' && isset($GLOBALS['currentLesson'] -> options[$option])) {
-				$lessonMode = $currentLesson -> options[$option];
+				$lessonMode = $GLOBALS['currentLesson'] -> options[$option];
 				if (is_null($lessonMode) || $lessonMode) { //in case it is NULL or 1
 					$lessonMode = true;
 				}
@@ -1867,7 +1867,8 @@ abstract class EfrontUser
 			}	
 		} else {
 			$lessonMode = true;
-		}			
+		}	
+				
 		$mode = $simpleMode && $disableMode && $coreAccessMode && $lessonMode;
 		return $mode;
 	}

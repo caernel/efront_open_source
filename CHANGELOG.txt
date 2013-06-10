@@ -8,6 +8,8 @@
 - Professor supervisors can now edit their branch's courses
 - Reversed the way that branch courses appear: Now, a subbranch's catalog lists all parent branches' courses, rather than the other way round (which was introduced in 3.6.13)
 - Autosaving tests
+- Fixed popup window in forum (New topic, New poll, Forum configuration) for IE
+- Fixed error while parsing recipient when sending new message
 
 === Version 3.6.13.2 - build 18005 ===
 - Added ability to import users-to-lessons assignments from CSV file

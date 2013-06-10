@@ -34,4 +34,5 @@ define("_MODULE_SECURITY_NEWFILESEXPLANATIONPART2", "They are old files from pre
 define("_MODULE_SECURITY_NEWFILESEXPLANATIONPART3", "They belong to modules that are not part of the original distribution. These would be under the &quot;www/modules&quot; folder");
 define("_MODULE_SECURITY_NEWFILESEXPLANATIONPART4", "They where put there from somebody else. If you haven't put them yourself, perhaps it's a sign that the system has bee compromised (hacked).");
 define("_MODULE_SECURITY_NEWFILESSOLUTIONEXPLANATION", ", download or delete any of these files");
+define("_MODULE_SECURITY_IGNOREALL", "Ignore all");
 ?>

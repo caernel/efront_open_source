@@ -869,6 +869,7 @@ h) Enhmerwsh ana X meres gia shmantika gegonota sto eFront (auto prepei na to sy
     	if (G_VERSIONTYPE == 'community') { #cpp#ifdef COMMUNITY
     		$notification = array ("message" 		 => $message,
 	    						   "subject" 		 => $subject,
+	    						   "send_recipients" => $recipients_category,
 	    						   "html_message"	 => ($html_message) ? 1: 0);
     	} else { #cpp#else
     		$notification = array ("event_type"		 => $event_type,

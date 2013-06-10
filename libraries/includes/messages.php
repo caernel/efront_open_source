@@ -362,9 +362,9 @@ try {
         	$predefined_recipients = "";
         	foreach ($predefined_recipients_array as $recipient_login) {
         		if ($predefined_recipients != "") {
-        			$predefined_recipients .= ";".$GLOBALS['_usernames'][$recipient_login];
+        			$predefined_recipients .= ";".formatLogin($recipient_login);
         		} else {
-        			$predefined_recipients = $GLOBALS['_usernames'][$recipient_login];
+        			$predefined_recipients = formatLogin($recipient_login);
         		}
 
         	}
@@ -373,7 +373,7 @@ try {
 
         if (isset($_GET['reply']) && in_array($_GET['reply'], $legalValues) && eF_checkParameter($_GET['reply'], 'id')) {
             $recipient = eF_getTableData("f_personal_messages", "sender, title, body", "id=".$_GET['reply']);
-            $form -> setDefaults(array('recipient' => $GLOBALS['_usernames'][$recipient[0]['sender']]));
+            $form -> setDefaults(array('recipient' => formatLogin($recipient[0]['sender']])));
             $form -> setDefaults(array('subject' => "Re: " . $recipient[0]['title']));
 
             $previous_text = "\n\n\n------------------ " . _ORIGINALMESSAGE. " ------------------\n" . $recipient[0]['body'];
@@ -388,7 +388,7 @@ try {
             $form -> setDefaults(array('body' => $previous_text));
         }
         if ($form -> isSubmitted() && $form -> validate()) {
-            $values = $form -> exportValues();
+            $values = $form -> exportValues();            
             if ($_SESSION['s_type'] == 'student') {
             	$values['subject'] = strip_tags($values['subject']);
             	$values['body'] = strip_tags($values['body']);
@@ -397,8 +397,12 @@ try {
             // The field with the recipients is no longer mandatory: we should check if it is empty
             //pr($values['recipient']);
 
-			if ($values['recipient']) {
-				$flippedLogins = array_flip($GLOBALS['_usernames']);
+			if ($values['recipient']) {				
+				$result = eF_getTableData("users", "id,name,surname,login", "active=1 and archive=0");//@todo: change this, performance hog
+				foreach ($result as $value) {
+					$usernames[$value['login']] = formatLogin($value);
+				}
+				$flippedLogins = array_flip($usernames);
 				if ($_admin_) {
 					$flippedLogins[_ALLUSERS] =  "[*]";
 				} elseif($_professor_){
@@ -418,7 +422,7 @@ try {
 						$recipients[] = $flippedLogins[$value];
 					} else { // because of $GLOBALS['_usernames'][$key] = $value.' ('.$key.')' in formatLogin for common names
 						$match = mb_substr($value , strpos($value, '(')+1, -1);
-						if (in_array($match, array_keys($GLOBALS['_usernames'])) === true) {
+						if (in_array($match, array_keys($usernames)) === true) {
 							$recipients[] = $match;
 						}
 					}
