@@ -1,15 +1,17 @@
-=== Version 3.6.13.3 - build  ===
-- Fixed wrong calculation of users limit (Commercial editions)
+=== Version 3.6.13.3 - build 18006 ===
+- Added autosaving functionality for tests
 - Added total space and files used from the installation under system reports
 - Users that are created from a supervisor are now placed in the supervisor's topmost branch
 - Corrupted tests can now be deleted
-- Fixed group courses assign to users for PHP version 5.3+
-- Fixed firefox not closing popups when returning from ajax functions
 - Professor supervisors can now edit their branch's courses
 - Reversed the way that branch courses appear: Now, a subbranch's catalog lists all parent branches' courses, rather than the other way round (which was introduced in 3.6.13)
-- Autosaving tests
+- Fixed wrong calculation of users limit
+- Fixed group courses assign to users for PHP version 5.3+
+- Fixed firefox not closing popups when returning from ajax functions
 - Fixed popup window in forum (New topic, New poll, Forum configuration) for IE
 - Fixed error while parsing recipient when sending new message
+- Fixed auto-update not containing sample config data, resulting in empty version number after upgrading
+- Fixed wrong parsing of SCORM's interactions.n.correct_responses for some interaction types
 
 === Version 3.6.13.2 - build 18005 ===
 - Added ability to import users-to-lessons assignments from CSV file

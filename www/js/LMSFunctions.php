@@ -352,7 +352,6 @@ function mySetValues(property, value)   //throw new myError(0);
     try {
         checkState();
         property = checkParameter(property);
-//      alert('property: '+property+' value: '+ value); //alert('return_value = ' + property + '.set('+value+')');
         eval('return_value = ' + property + '.set(value)')
     } catch (e) {
         myErrorHandler(e);
@@ -2222,7 +2221,7 @@ correct_responsesObject = function()
         this.get = function()      { throw new myError('404'); }
         this.set = function(param)
         {
-            if (!checkDataType(param, 'CMIFeedback', cmi.interactions[_TEMP2].type.getValue()))
+	        if (!checkDataType(param, 'CMIFeedback', cmi.interactions[_TEMP].type.getValue()))
             {
                 throw new myError('405');
             }

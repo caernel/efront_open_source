@@ -496,7 +496,7 @@ try {
 	    require_once("glossary.php");
 	}
 	elseif ($ctg == 'survey') {
-	    if (EfrontUser::isOptionVisible('surveys')) {
+	    if (!EfrontUser::isOptionVisible('surveys')) {
 	        eF_redirect("".basename($_SERVER['PHP_SELF'])."?ctg=control_panel&message=".urlencode(_UNAUTHORIZEDACCESS)."&message_type=failure");
 	    }
 	    $load_editor=true;

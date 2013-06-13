@@ -16,6 +16,7 @@ if ($('module_administrator_tools_autocomplete_impersonate')) {
 }
 function activate(el, action) {
 	Element.extend(el);
+	el = el.down();
 	parameters = {ajax:1, method: 'get'};	
 	el.down().className.match(/inactiveImage/) ? parameters = Object.extend(parameters, {activate:action}) : parameters = Object.extend(parameters, {deactivate:action}) ;
 	el.down().setAttribute('src', 'themes/default/images/others/progress_big.gif');

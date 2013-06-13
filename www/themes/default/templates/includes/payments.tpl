@@ -181,7 +181,7 @@
 				{if $T_TRANSACTIONS_LOG_FILE}
 				<span>
 					<img src = "images/16x16/search.png" title = "{$smarty.const._VIEWTRANSACTIONLOGFILE}" alt = "{$smarty.const._VIEWTRANSACTIONLOGFILE}">
-					<a href = "view_file.php?file={$T_TRANSACTIONS_LOG_FILE}&download=1" title = "{$smarty.const._VIEWTRANSACTIONLOGFILE}" >{$smarty.const._VIEWTRANSACTIONLOGFILE}</a>
+					<a href = "view_file.php?file={$T_TRANSACTIONS_LOG_FILE}&download=1&bypass=true" title = "{$smarty.const._VIEWTRANSACTIONLOGFILE}" >{$smarty.const._VIEWTRANSACTIONLOGFILE}</a>
 				</span>
 				{/if}
 				<span>

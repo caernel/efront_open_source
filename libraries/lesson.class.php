@@ -944,8 +944,9 @@ class EfrontLesson
 		$select  = "u.*, ul.lessons_ID,ul.completed,ul.score,ul.user_type as role,ul.from_timestamp as active_in_lesson, ul.to_timestamp as timestamp_completed, ul.comments, ul.done_content, 1 as has_lesson";
 		$where[] = "u.login=ul.users_LOGIN and ul.lessons_ID='".$this -> lesson['id']."' and ul.archive=0";
 		$from = EfrontLesson::appendTableFiltersUserConstraints("users u JOIN users_to_lessons ul ON u.login=ul.users_LOGIN", $constraints);
-		$result  = eF_getTableData($from, $select, implode(" and ", $where), $orderby, false, $limit);
-
+	
+		$result  = eF_getTableData($from, $select, implode(" and ", $where), $orderby, 'u.login', $limit);	// Added group by because of #3943	
+		
 		if (!isset($constraints['return_objects']) || $constraints['return_objects'] == true) {
 			return EfrontUser :: convertDatabaseResultToUserObjects($result);
 		} else {
@@ -1852,6 +1853,7 @@ class EfrontLesson
 				$lessonUsers[$key]['active_time_in_lesson']   = $activeUsersTimes[$user['login']];
 			}
 		}
+	
 		return $lessonUsers;
 
 	}

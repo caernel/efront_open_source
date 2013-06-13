@@ -113,15 +113,29 @@ if (version_compare($dbVersion, '3.6.13') == -1) {
 	}
 }
 
+if (version_compare($dbVersion, '3.6.13') == 0) {
+	try {
+		$db->Execute("alter table `users` change `last_login` `last_login` int(10) unsigned NOT NULL DEFAULT 0");
+	} catch (Exception $e) {
+		$failed_queries[] = $e->getMessage();
+	}
+	
+	try {
+		if (is_file('tincan_queries.txt')) {
+			$GLOBALS['db'] -> Execute("set foreign_key_checks=0");
+			foreach (explode(";\n", file_get_contents('tincan_queries.txt')) as $command) {
+				if (trim($command)) {
+					$GLOBALS['db'] -> execute(trim($command));
+				}
+			}
+			$GLOBALS['db'] -> Execute("set foreign_key_checks=1");
+		}
+	} catch (Exception $e) {
+		$failed_queries[] = $e->getMessage();
+	}
+}
+
 if (!empty($failed_queries)) {
 	throw new Exception(implode('<br/>', $failed_queries));
 }
-
-/*
- * new version: 
- * create index name on directions(name)
- * create index directions_ID on lessons(directions_ID)
- * 
- * */
-?>
 

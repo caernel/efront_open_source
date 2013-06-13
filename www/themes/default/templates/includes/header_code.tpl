@@ -48,7 +48,7 @@
 	            </span>
 	            {/if}
 	            <span class="headerText dropdown">
-	                <a class="dropdown-toggle" data-toggle="dropdown" href="#">#filter:login-{$smarty.session.s_login}# <b class="caret"></b></a>
+	                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">#filter:login-{$smarty.session.s_login}# <b class="caret"></b></a>
 	                <ul class="dropdown-menu">
 					{if $T_MAPPED_ACCOUNTS && $smarty.get.ctg !='agreement'}
 	                    <li class="nav-header">{$smarty.const._SWITCHACCOUNT}</li>

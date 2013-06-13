@@ -373,7 +373,7 @@ try {
 
         if (isset($_GET['reply']) && in_array($_GET['reply'], $legalValues) && eF_checkParameter($_GET['reply'], 'id')) {
             $recipient = eF_getTableData("f_personal_messages", "sender, title, body", "id=".$_GET['reply']);
-            $form -> setDefaults(array('recipient' => formatLogin($recipient[0]['sender']])));
+            $form -> setDefaults(array('recipient' => formatLogin($recipient[0]['sender'])));
             $form -> setDefaults(array('subject' => "Re: " . $recipient[0]['title']));
 
             $previous_text = "\n\n\n------------------ " . _ORIGINALMESSAGE. " ------------------\n" . $recipient[0]['body'];
