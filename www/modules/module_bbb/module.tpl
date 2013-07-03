@@ -1,55 +1,97 @@
 {*Smarty template*}
 
 {if $smarty.session.s_type == "administrator"}
-    {capture name = 't_BBB_server'}
-                {$T_BBB_FORM.javascript}
-                <form {$T_BBB_FORM.attributes}>
-                    {$T_BBB_FORM.hidden}
-                    <table class = "formElements">
-                        <tr><td class = "labelCell">{$smarty.const._BBB_BBBSERVERNAME}:&nbsp;</td>
-                            <td class = "elementCell">{$T_BBB_FORM.server.html}</td>
-                            <td class = "elementCell" align="left" width="100%">&nbsp;<a href="javascript:void(0)" onClick="document.getElementById('server_input').value = ''" ><img src="images/16x16/go_into.png" title="{$smarty.const._BBB_RESETDEFAULTSERVER}" alt="{$smarty.const._BBB_RESETDEFAULTSERVER}" border =0 style="vertical-align:middle"/></a> </td>
-							<td class = "formError">{$T_BBB_FORM.server.error}</td></tr>
-							<td class = "labelCell">{$smarty.const._BBB_SECURITYSALT}:&nbsp;</td>
-							<td class = "elementCell">{$T_BBB_FORM.salt.html}</td></tr>
-							<td class = "labelCell">{$smarty.const._BBB_BBBSERVERVERSION}:&nbsp;</td>
-							<td class = "elementCell">{$T_BBB_FORM.serverVersion.html}</td>
-							<tr><td></td><td >&nbsp;</td></tr>
-                        <tr><td></td><td class = "submitCell">{$T_BBB_FORM.submit_BBB_server.html}</td></tr>
-                    </table>
-                </form>
+	{capture name = 't_BBB_server'}
+    	{$T_BBB_FORM.javascript}
+		<form {$T_BBB_FORM.attributes}>
+			{$T_BBB_FORM.hidden}
+			<table class = "formElements">
+				<tr>
+					<td class = "labelCell">{$smarty.const._BBB_BBBSERVERNAME}:&nbsp;</td>
+					<td class = "elementCell">{$T_BBB_FORM.server.html}</td>
+					<td class = "elementCell" align="left" width="100%">&nbsp;<a href="javascript:void(0)" onClick="document.getElementById('server_input').value = ''" ><img src="images/16x16/go_into.png" title="{$smarty.const._BBB_RESETDEFAULTSERVER}" alt="{$smarty.const._BBB_RESETDEFAULTSERVER}" border =0 style="vertical-align:middle"/></a> </td>
+					<td class = "formError">{$T_BBB_FORM.server.error}</td>
+				</tr>
+				<tr>
+					<td class = "labelCell">{$smarty.const._BBB_SECURITYSALT}:&nbsp;</td>
+					<td class = "elementCell">{$T_BBB_FORM.salt.html}</td>
+				</tr>
+				<tr>
+					<td class = "labelCell">{$smarty.const._BBB_LOGOUTURL}:&nbsp;</td>
+					<td class = "elementCell">{$T_BBB_FORM.logout_url.html}</td>				
+				</tr>
+				<tr>
+					<td class = "labelCell">{$smarty.const._BBB_BBBSERVERVERSION}:&nbsp;</td>
+					<td class = "elementCell">{$T_BBB_FORM.serverVersion.html}</td>					
+				</tr>
+				<tr>
+					<td></td>
+					<td >&nbsp;</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td class = "submitCell">{$T_BBB_FORM.submit_BBB_server.html}</td>
+				</tr>
+			</table>
+		</form>
     {/capture}
-
     {eF_template_printBlock title=$smarty.const._BBB_BBBSERVER data=$smarty.capture.t_BBB_server absoluteImagePath=1 image=$T_BBB_MODULE_BASELINK|cat:'images/BBB32.png'}
-
 {else}
-    {if $smarty.get.add_BBB || $smarty.get.edit_BBB}
+	{if $smarty.get.add_BBB || $smarty.get.edit_BBB}
         {capture name = 't_insert_BBB_code'}
-                    {$T_BBB_FORM.javascript}
-                    <form {$T_BBB_FORM.attributes}>
-                        {$T_BBB_FORM.hidden}
-                        <table class = "formElements">
-                            <tr><td class = "labelCell">{$smarty.const._BBB_NAME}:&nbsp;</td>
-                                <td class = "elementCell">{$T_BBB_FORM.name.html}</td>
-                                <td class = "formError">{$T_BBB_FORM.name.error}</td></tr>
-                            <tr><td class = "labelCell">{$smarty.const._BBB_DATE}:&nbsp;</td>
-                                <td class = "elementCell"><table><tr><td>{$T_BBB_FORM.day.html}</td>
-                                                                     <td>{$T_BBB_FORM.month.html}</td>
-                                                                     <td>{$T_BBB_FORM.year.html}</td>
-                                                                     </tr></table>
-                            <tr><td class = "labelCell">{$smarty.const._BBB_TIME}:&nbsp;</td>
-                                <td class = "elementCell"><table><tr><td>{$T_BBB_FORM.hour.html}</td>
-                                                                     <td>{$T_BBB_FORM.minute.html}</td>
-                                                                     </tr></table>
-                            <tr><td class = "labelCell">{$smarty.const._BBBDURATION}:&nbsp;</td>
-                                <td class = "elementCell"><table><tr><td>{$T_BBB_FORM.duration_hours.html}</td>
-                                                                     <td>{$T_BBB_FORM.duration_minutes.html}</td>
-                                                                     </tr></table>
-                            <tr><td></td><td >&nbsp;</td></tr>
-
-                            <tr><td></td><td class = "submitCell">{$T_BBB_FORM.submit_BBB.html}</td></tr>
-                        </table>
-                    </form>
+		{$T_BBB_FORM.javascript}
+        <form {$T_BBB_FORM.attributes}>
+        	{$T_BBB_FORM.hidden}
+            <table class = "formElements">
+            	<tr>
+            		<td class = "labelCell">{$smarty.const._BBB_NAME}:&nbsp;</td>
+                    <td class = "elementCell">{$T_BBB_FORM.name.html}</td>
+                    <td class = "formError">{$T_BBB_FORM.name.error}</td>
+				</tr>
+				<tr>
+					<td class = "labelCell">{$smarty.const._BBB_DATE}:&nbsp;</td>
+                    <td class = "elementCell">
+                    	<table>
+                    		<tr>
+                    			<td>{$T_BBB_FORM.day.html}</td>
+								<td>{$T_BBB_FORM.month.html}</td>
+                                <td>{$T_BBB_FORM.year.html}</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td class = "labelCell">{$smarty.const._BBB_TIME}:&nbsp;</td>
+                    <td class = "elementCell">
+                    	<table>
+                    		<tr>
+                    			<td>{$T_BBB_FORM.hour.html}</td>
+                    			<td>{$T_BBB_FORM.minute.html}</td>
+                			</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td class = "labelCell">{$smarty.const._BBBDURATION}:&nbsp;</td>
+					<td class = "elementCell">
+						<table>
+							<tr>
+								<td>{$T_BBB_FORM.duration_hours.html}</td>
+                                <td>{$T_BBB_FORM.duration_minutes.html}</td>
+                            </tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td >&nbsp;</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td class = "submitCell">{$T_BBB_FORM.submit_BBB.html}</td>
+				</tr>
+			</table>
+		</form>
 
         {/capture}
 
@@ -244,7 +286,7 @@
 	                                <a href = "{$T_BBB_MODULE_BASEURL}&edit_BBB={$meeting.id}" class = "editLink"><img border = "0" src = "images/16x16/edit.png" title = "{$smarty.const._EDIT}" alt = "{$smarty.const._EDIT}" /></a>
 	                            </td>
 	                            <td width="30%">
-	                                {if $meeting.status == "0" && !$meeting.mayStart}<img border = "0" src = "{$T_BBB_MODULE_BASELINK}images/server_client_exchange.png" class = "inactiveImage" title = "{$smarty.const._BBBJOINMEETING}" alt = "{$smarty.const._BBBJOINMEETING}" />{elseif $meeting.mayStart}<a href = "{$T_BBB_CREATEMEETINGURL}" onClick="return confirm('{$smarty.const._BBB_AREYOUSUREYOUWANTTOSTARTTHECONFERENCE}')" class = "editLink"><img border = "0" src = "{$T_BBB_MODULE_BASELINK}images/server_client_exchange.png" title = "{$smarty.const._BBBSTARTMEETING}" alt = "{$smarty.const._BBBSTARTMEETING}" /></a>{/if}
+	                                {if $meeting.status == "0" && !$meeting.mayStart}<img border = "0" src = "{$T_BBB_MODULE_BASELINK}images/server_client_exchange.png" class = "inactiveImage" title = "{$smarty.const._BBBJOINMEETING}" alt = "{$smarty.const._BBBJOINMEETING}" />{elseif $meeting.mayStart}<a href = "{$T_BBB_CREATEMEETINGURL}" target="_blank" onClick="return confirm('{$smarty.const._BBB_AREYOUSUREYOUWANTTOSTARTTHECONFERENCE}')" class = "editLink"><img border = "0" src = "{$T_BBB_MODULE_BASELINK}images/server_client_exchange.png" title = "{$smarty.const._BBBSTARTMEETING}" alt = "{$smarty.const._BBBSTARTMEETING}" /></a>{/if}
 	                            </td>
 	                            <td width="30%">
 	                            {else}

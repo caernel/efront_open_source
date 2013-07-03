@@ -66,4 +66,5 @@ define("_BBB_AREYOUSUREYOUWANTTOSTARTTHECONFERENCE", "Are you sure you want to s
 define("_BBB_RESETDEFAULTSERVER","Reset default server");
 define("_BBB_IN","In");
 define("_BBB_NOW","Now!");
+define("_BBB_LOGOUTURL", "Logout URL");
 ?>

@@ -935,10 +935,19 @@ function startAutoCompleter(el, id, options) {
 	autocompleter.activate();
 }
 
-jQuery('div[id*=question_]').on('click', function(event) {
-	//var url = jQuery(this).parents('form').attr('action');
-	jQuery.post(jQuery(this).parents('form').attr('action')+'&auto_save=1', jQuery(this).parents('form').serialize());
-	event.stopPropagation();
+jQuery('div[id*=question_]').find('input,select,textarea,div.draggable').on('mouseup', function(event) {
+	var current_timestamp = Math.round(new Date().getTime() / 1000);
+	if (typeof (window.last_autosave) == 'undefined') {
+		window.last_autosave = current_timestamp;
+	}
+	//console.log(current_timestamp);
+	//console.log(window.last_autosave);
+	if (current_timestamp > window.last_autosave+20) {
+		window.last_autosave = current_timestamp;
+		//var url = jQuery(this).parents('form').attr('action');
+		jQuery.post(jQuery(this).parents('form').attr('action')+'&auto_save=1', jQuery(this).parents('form').serialize());
+		event.stopPropagation();
+	}
 });
 
 

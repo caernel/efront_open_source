@@ -4298,4 +4298,5 @@ define("_GOTO", "Go to");
 define("_USERSTOLESSONS", "Users to lessons");
 define("_NEWLESSONASSIGNMENT", "New lesson assignment");
 define("_COULDNOTFINDLESSON", "Could not find lesson");
+define("_AFORUMDOESNOTEXISTFORTHISLESSONCREATE", "A forum does not exist for this lesson, but you can create one");
 ?>

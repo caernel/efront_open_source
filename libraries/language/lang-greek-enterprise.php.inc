@@ -4298,4 +4298,5 @@ define("_GOTO", "Μετάβαση σε");
 define("_USERSTOLESSONS", "Αναθέσεις μαθημάτων σε χρήστες");
 define("_NEWLESSONASSIGNMENT", "Νέα ανάθεση μαθήματος");
 define("_COULDNOTFINDLESSON", "Το μάθημα δε βρέθηκε");
+define("_AFORUMDOESNOTEXISTFORTHISLESSONCREATE", "Δεν υπάρχει φόρουμ για αυτό το μάθημα, αλλά μπορείτε να δημιουργήσετε");
 ?>

@@ -301,6 +301,9 @@ abstract class EfrontUser
 		}
 		$roles = EfrontUser::getRoles();
 		$rolesTypes = EfrontUser::getRoles(true);
+		foreach (EfrontUser::getRoles(true) as $key => $value) {
+			$rolesTypes[$key] = mb_strtolower($value);
+		}
 		
 		//If a user type is not specified, by default make the new user student
 		if (!isset($userProperties['user_type'])) {	
@@ -308,7 +311,7 @@ abstract class EfrontUser
 		} else {
 			if (in_array(mb_strtolower($userProperties['user_type']), $roles)) {
 				$userProperties['user_type'] = mb_strtolower($userProperties['user_type']);
-			} else if ($k=array_search($userProperties['user_type'], $rolesTypes)) {
+			} else if ($k=array_search(mb_strtolower($userProperties['user_type']), $rolesTypes)) {
 				$userProperties['user_types_ID'] = $k;
 				$userProperties['user_type'] = $roles[$k];
 			} else {
@@ -346,6 +349,14 @@ abstract class EfrontUser
 		
 		!isset($userProperties['timezone']) || $userProperties['timezone'] == ''  ? $userProperties['timezone'] = $GLOBALS['configuration']['time_zone'] :null;
 		
+		$userProfile = eF_getTableData("user_profile", "name,options", "active=1 AND type='select'");
+		foreach ($userProfile as $field) {
+			if(isset($userProperties[$field['name']])) {
+				$options = unserialize($field['options']);
+				$userProperties[$field['name']] = array_search($userProperties[$field['name']], $options);
+			}
+		}
+				
 		eF_insertTableData("users", $userProperties);
 
 		// Assign to the new user all skillgap tests that should be automatically assigned to every new student

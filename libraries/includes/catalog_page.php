@@ -122,6 +122,7 @@ if (!isset($_GET['checkout'])) {
 		$branch = new EfrontBranch($_SESSION['s_current_branch']);
 		$constraints = array('active' => true, 'archive' => false, 'instance' => false, 'sort' => 'name');
 		$courses = $branch->getBranchCoursesIncludingParentBranches($constraints);
+		//$courses = $branch->getBranchCoursesIncludingSubbranches($constraints);
 		$lessons = array();
 	}
 	
@@ -137,7 +138,11 @@ if (!isset($_GET['checkout'])) {
 								 'collapse'	   => $GLOBALS['configuration']['collapse_catalog'],
 								 'buy_link'	   => true,
 	            				 'course_lessons' => false);
-	include("directions_tree.php");
+	if (!empty($courses) || !empty($lessons)) {
+		include("directions_tree.php");
+	}
+	
+	
 
 	$smarty -> assign("T_CART", cart :: prepareCart());
 }

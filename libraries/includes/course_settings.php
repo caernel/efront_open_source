@@ -91,7 +91,7 @@ if ($_GET['op'] == 'course_info') {
 
 } else if ($_GET['op'] == 'course_certificates') {
 	$load_editor = 1;
-	$defaultConstraints = array('active' => true, 'instance' => false);
+	$defaultConstraints = array('active' => true, 'instance' => false, 'return_objects' => false);
 	//$users = $currentCourse -> getCourseUsers($constraints);
 	if ($_SESSION['s_type'] != 'administrator' && $_SESSION['s_current_branch']) {	//this applies to supervisors only
 		$stats_filters = array();
@@ -117,9 +117,10 @@ if ($_GET['op'] == 'course_info') {
 	foreach ($rolesBasic as $key => $role) {
 		$role != 'student' OR $studentRoles[] = $key;
 	}
-	if (isset($_GET['edit_user']) && in_array($_GET['edit_user'], array_keys($users = $currentCourse -> getCourseUsers($defaultConstraints)))) {
-		//$userStats = EfrontStats::getUsersCourseStatus($currentCourse, $_GET['edit_user']);
-		$user = $users[$_GET['edit_user']];
+
+	$users = $currentCourse -> getCourseUsers($defaultConstraints);
+	if (isset($_GET['edit_user']) && isset($users[$_GET['edit_user']])) {
+		$user = EfrontUserFactory::factory($users[$_GET['edit_user']]);
 		//pr($user -> getUserLessons());exit;
 		$form = new HTML_QuickForm("edit_user_complete_course_form", "post", basename($_SERVER['PHP_SELF']).'?'.$baseUrl.'&op=course_certificates&edit_user='.$_GET['edit_user'].'&popup=1', "", null, true);
 		$form -> registerRule('checkParameter', 'callback', 'eF_checkParameter');                   //Register this rule for checking user input with our function, eF_checkParameter
@@ -176,7 +177,7 @@ if ($_GET['op'] == 'course_info') {
 		$renderer = prepareFormRenderer($form);
 		$smarty -> assign('T_COMPLETE_COURSE_FORM', $renderer -> toArray());
 
-	} else if (isset($_GET['issue_certificate']) && in_array($_GET['issue_certificate'], array_keys($users = $currentCourse -> getCourseUsers($defaultConstraints)))) {
+	} else if (isset($_GET['issue_certificate']) && isset($users[$_GET['issue_certificate']])) {
 		try {
 			$certificate = $currentCourse -> prepareCertificate($_GET['issue_certificate']);
 			$currentCourse -> issueCertificate($_GET['issue_certificate'], $certificate);
@@ -186,7 +187,7 @@ if ($_GET['op'] == 'course_info') {
 			$message      = _PROBLEMISSUINGCERTIFICATE.': '.$e -> getMessage().' ('.$e -> getCode().') &nbsp;<a href = "javascript:void(0)" onclick = "eF_js_showDivPopup(event, \''._ERRORDETAILS.'\', 2, \'error_details\')">'._MOREINFO.'</a>';
 			$message_type = 'failure';
 		}
-	} else if (isset($_GET['revoke_certificate']) && in_array($_GET['revoke_certificate'], array_keys($users = $currentCourse -> getCourseUsers($defaultConstraints)))) {
+	} else if (isset($_GET['revoke_certificate']) && isset($users[$_GET['revoke_certificate']])) {
 		try {
 			$currentCourse -> revokeCertificate($_GET['revoke_certificate']);
 			eF_redirect(''.basename($_SERVER['PHP_SELF']).'?'.$baseUrl.'&op=course_certificates&reset_popup=1&message='.urlencode(_CERTIFICATEREVOKED).'&message_type=success');
@@ -195,7 +196,7 @@ if ($_GET['op'] == 'course_info') {
 			$message      = _PROBLEMREVOKINGCERTIFICATE.': '.$e -> getMessage().' &nbsp;<a href = "javascript:void(0)" onclick = "eF_js_showDivPopup(event, \''._ERRORDETAILS.'\', 2, \'error_details\')">'._MOREINFO.'</a>';
 			$message_type = 'failure';
 		}
-	} else if (isset($_GET['reset_keep']) && in_array($_GET['reset_keep'], array_keys($users = $currentCourse -> getCourseUsers($defaultConstraints)))) {
+	} else if (isset($_GET['reset_keep']) && isset($users[$_GET['reset_keep']])) {
 		try {
 			$user = EfrontUserFactory :: factory($_GET['reset_keep']);
 			$user -> resetProgressInCourse($currentCourse, true, true);
@@ -205,7 +206,7 @@ if ($_GET['op'] == 'course_info') {
 			$message      = _PROBLEMRESETINGPROGRESS.': '.$e -> getMessage().' &nbsp;<a href = "javascript:void(0)" onclick = "eF_js_showDivPopup(event, \''._ERRORDETAILS.'\', 2, \'error_details\')">'._MOREINFO.'</a>';
 			$message_type = 'failure';
 		}
-	} else if (isset($_GET['change_key']) && in_array($_GET['login'], array_keys($users = $currentCourse -> getCourseUsers($defaultConstraints)))) {
+	} else if (isset($_GET['change_key']) && isset($users[$_GET['login']])) {
 		try {
 			$result = eF_getTableData("users_to_courses", "users_LOGIN,issued_certificate", "courses_ID = ".$currentCourse -> course['id']. " and users_LOGIN = '".$_GET['login']."'");
 			$issued_certificate = unserialize($result[0]['issued_certificate']);
@@ -254,7 +255,7 @@ if ($_GET['op'] == 'course_info') {
 		try {
 			$users = $currentCourse -> getCourseUsers($defaultConstraints);
 			foreach ($users as $key => $value) {
-				if ($value -> user['completed'] && !$value -> user['issued_certificate']) {
+				if ($value['completed'] && !$value['issued_certificate']) {
 					$certificate = $currentCourse -> prepareCertificate($key);
 					$currentCourse -> issueCertificate($key, $certificate);
 				}
@@ -267,9 +268,9 @@ if ($_GET['op'] == 'course_info') {
 		try {
 			$users = $currentCourse -> getCourseUsers($defaultConstraints);
 			foreach ($users as $key => $value) {
-				if ($value -> user['issued_certificate']) {
-					$unserialized_data = unserialize($value -> user['issued_certificate']);
-					$unserialized_data['date'] = $value -> user['to_timestamp'];
+				if ($value['issued_certificate']) {
+					$unserialized_data = unserialize($value['issued_certificate']);
+					$unserialized_data['date'] = $value['to_timestamp'];
 					eF_updateTableData('users_to_courses', array("issued_certificate" => serialize($unserialized_data)), "courses_ID=".$currentCourse -> course['id']." and users_LOGIN='".$key."'");
 				}
 			}
@@ -282,22 +283,22 @@ if ($_GET['op'] == 'course_info') {
 			try {				
 				$users = $currentCourse -> getCourseUsers($defaultConstraints);				
 				foreach ($users as $key => $value) {
-					if ($currentCourse -> course['certificate_expiration'] && $value -> user['issued_certificate']) {
-						$dateTable 	= unserialize($value -> user['issued_certificate']);
+					if ($currentCourse -> course['certificate_expiration'] && $value['issued_certificate']) {
+						$dateTable 	= unserialize($value['issued_certificate']);
 					
 						$expirationArray	= convertTimeToDays($currentCourse -> course['certificate_expiration']);
 						$timeExpire  		= getCertificateExpirationTimestamp($dateTable['date'], $expirationArray);	
 
 						//Revoke certificate if it has expired, and optionally reset access to the course as well
-						if ($timeExpire && $timeExpire < time() && $value -> user['issued_certificate']) {
+						if ($timeExpire && $timeExpire < time() && $value['issued_certificate']) {
 							$currentCourse -> revokeCertificate($key);
 							if ($currentCourse -> course['reset'] == 1) {
 								$currentCourse -> removeUsers($key);
-								$currentCourse -> addUsers($key, $value -> user['user_type']);
+								$currentCourse -> addUsers($key, $value['user_type']);
 							}
 							
 							EfrontEvent::triggerEvent(array("type" => EfrontEvent::COURSE_CERTIFICATE_EXPIRY,
-										"users_LOGIN"  => $value -> user['login'],
+										"users_LOGIN"  => $value['login'],
 										"lessons_ID"   => $currentCourse	-> course['id'],
 										"lessons_name" => $currentCourse	-> course['name']));
 						}
@@ -669,8 +670,9 @@ if ($_GET['op'] == 'course_info') {
 			}
 			$output = $pdf->Output('', 'S');
 
-			file_put_contents($currentUser->getDirectory().str_replace('/', '_', $fileNamePdf), $output);
-			$file = new EfrontFile($currentUser->getDirectory(). str_replace('/', '_', $fileNamePdf), $output);
+			$pathname = $currentUser->getDirectory().str_replace(array('/', ':', '\\', '?', '&'), '_',$fileNamePdf);
+			file_put_contents($pathname, $output);
+			$file = new EfrontFile($pathname, $output);
 			$file -> sendFile();
 				
 		}
@@ -1413,34 +1415,38 @@ if ($_GET['op'] == 'course_info') {
 
 				$courseUsers = $currentCourse->getCourseUsers(array('archive' => false, 'active' => true, 'return_objects' => false));
 
-				if ($previous_start_date != $currentCourse -> course['start_date']) {					
-					eF_deleteTableData("notifications", "id_type_entity LIKE '%_". (-1) * EfrontEvent::COURSE_PROGRAMMED_START . "_" . $currentCourse -> course['id']. "'");
-					foreach ($courseUsers as $user) {
-						$event = array("type" => EfrontEvent::COURSE_PROGRAMMED_START,
-								"users_LOGIN" => $user['login'],
-								"users_name" => $user['name'],
-								"users_surname" => $user['surname'],
-								"timestamp" => $currentCourse -> course['start_date'], 
-								"lessons_ID" => $currentCourse -> course['id'], 
-								"lessons_name" => $currentCourse -> course['name'], 
-								"entity_ID" => $currentCourse -> course['start_date'], 
-								"entity_name" => $currentCourse -> course['end_date']);
-						EfrontEvent::triggerEvent($event);
+				if ($previous_start_date != $currentCourse -> course['start_date']) {
+					eF_deleteTableData("notifications", "id_type_entity LIKE '%_". (-1) * EfrontEvent::COURSE_PROGRAMMED_START . "_" . $currentCourse -> course['id']. "%'");
+					if ($currentCourse -> course['start_date'] > time()) {
+						foreach ($courseUsers as $user) {
+							$event = array("type" => EfrontEvent::COURSE_PROGRAMMED_START,
+									"users_LOGIN" => $user['login'],
+									"users_name" => $user['name'],
+									"users_surname" => $user['surname'],
+									"timestamp" => $currentCourse -> course['start_date'],
+									"lessons_ID" => $currentCourse -> course['id'],
+									"lessons_name" => $currentCourse -> course['name'],
+									"entity_ID" => $currentCourse -> course['start_date'],	//we use the entity_ID, entity_name fields for different functionality, see createSubstitutionsArray()
+									"entity_name" => $currentCourse -> course['end_date']);
+							EfrontEvent::triggerEvent($event);
+						}
 					}
 				}
 				if ($previous_end_date != $currentCourse -> course['end_date']) {
-					eF_deleteTableData("notifications", "id_type_entity LIKE '%_". (-1) * EfrontEvent::COURSE_PROGRAMMED_EXPIRY . "_" . $currentCourse -> course['id']. "'");
-					foreach ($courseUsers as $user) {
-						$event = array("type" => EfrontEvent::COURSE_PROGRAMMED_EXPIRY, 
-								"users_LOGIN" => $user['login'],
-								"users_name" => $user['name'],
-								"users_surname" => $user['surname'],
-								"timestamp" => $currentCourse -> course['end_date'],   
-								"lessons_ID" => $currentCourse -> course['id'], 
-								"lessons_name" => $currentCourse -> course['name'], 
-								"entity_ID" => $currentCourse -> course['start_date'], 
-								"entity_name" => $currentCourse -> course['end_date']);
-						EfrontEvent::triggerEvent($event);
+					eF_deleteTableData("notifications", "id_type_entity LIKE '%_". (-1) * EfrontEvent::COURSE_PROGRAMMED_EXPIRY . "_" . $currentCourse -> course['id']. "%'");
+					if ($currentCourse -> course['end_date'] > time()) {
+						foreach ($courseUsers as $user) {
+							$event = array("type" => EfrontEvent::COURSE_PROGRAMMED_EXPIRY,
+									"users_LOGIN" => $user['login'],
+									"users_name" => $user['name'],
+									"users_surname" => $user['surname'],
+									"timestamp" => $currentCourse -> course['end_date'],
+									"lessons_ID" => $currentCourse -> course['id'],
+									"lessons_name" => $currentCourse -> course['name'],
+									"entity_ID" => $currentCourse -> course['start_date'],
+									"entity_name" => $currentCourse -> course['end_date']);
+							EfrontEvent::triggerEvent($event);
+						}
 					}
 				}
 				echo _FROM.' '.formatTimestamp($fromTimestamp, 'time_nosec').' '._TO.' '.formatTimestamp($toTimestamp, 'time_nosec').'&nbsp;';

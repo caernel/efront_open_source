@@ -107,10 +107,7 @@
                         <tr {if !$T_FULL_ACCESS}style = "display:none"{/if}><td>{$T_ADD_MESSAGE_FORM.recipients.specific_skill.html}  </td><td>{$smarty.const._EMPLOYEESWITHSKILL}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.skill_recipients.html}</td></tr>
 
                         {* Groups: Available for all types*}
-                        <tr><td>{$T_ADD_MESSAGE_FORM.recipients.specific_group.html}  </td><td>{$smarty.const._EMPLOYEESINGROUP}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.group_recipients.html}</td></tr>
-
-                        {* Admin and supservisors *}
-                        <tr {if !$T_FULL_ACCESS}style = "display:none"{/if}><td>{$T_ADD_MESSAGE_FORM.recipients.specific_type.html}  </td><td>{$smarty.const._SPECIFICTYPEUSERS}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.user_type.html}</td></tr>
+                        <tr style = "display:none"><td>{$T_ADD_MESSAGE_FORM.recipients.specific_group.html}  </td><td>{$smarty.const._EMPLOYEESINGROUP}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.group_recipients.html}</td></tr>
 
                     {else} {* #cpp#else *}
                          {* Regular eFront selects *}
@@ -122,14 +119,13 @@
                          <tr {if !$T_LESSONS}style = "display:none"{/if}><td>{$T_ADD_MESSAGE_FORM.recipients.specific_lesson.html}</td><td>{$smarty.const._USERSCONNECTEDTOSPECIFICLESSON}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.lesson.html}</td></tr>
                          <tr {if !$T_LESSONS}style = "display:none"{/if}><td>{$T_ADD_MESSAGE_FORM.recipients.specific_lesson_professor.html}</td><td>{$smarty.const._PROFESSORSOFLESSON}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.professor.html}</td></tr>
 
-                         {* Admin and supservisors *}
-                         <tr {if !$T_FULL_ACCESS}style = "display:none"{/if}><td>{$T_ADD_MESSAGE_FORM.recipients.specific_type.html}  </td><td>{$smarty.const._SPECIFICTYPEUSERS}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.user_type.html}</td></tr>
-
                          {* Groups: Available for all types*}
-                         <tr><td>{$T_ADD_MESSAGE_FORM.recipients.specific_group.html}  </td><td>{$smarty.const._USERSINGROUP}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.group_recipients.html}</td></tr>
+                         <tr style = "display:none"><td>{$T_ADD_MESSAGE_FORM.recipients.specific_group.html}  </td><td>{$smarty.const._USERSINGROUP}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.group_recipients.html}</td></tr>
 
                     {/if} {* #cpp#endif *}
-
+                    	<tr><td colspan = "100%"><hr></td></tr>
+                         {* Admin and supservisors *}
+                         <tr {if !$T_FULL_ACCESS}style = "display:none"{/if}><td>{$T_ADD_MESSAGE_FORM.specific_type.html}  </td><td>{$smarty.const._SPECIFICTYPEUSERS}:&nbsp;</td><td>{$T_ADD_MESSAGE_FORM.user_type.html}</td></tr>
                     </table>
                 </div>
             </div>

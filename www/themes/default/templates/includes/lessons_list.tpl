@@ -135,7 +135,16 @@ translations['_YOUHAVEBEENSUCCESSFULLYADDEDTOTHEGROUP'] = '{$smarty.const._YOUHA
 						{/capture}
 						{eF_template_printBlock title = $smarty.const._COURSECATALOG data = $smarty.capture.t_catalog_code image = '32x32/catalog.png'}
 						*}
-						{eF_template_printBlock title = $smarty.const._COURSECATALOG data = $T_DIRECTIONS_TREE image = '32x32/catalog.png'}
+						{if $T_DIRECTIONS_TREE}
+							{eF_template_printBlock title = $smarty.const._COURSECATALOG data = $T_DIRECTIONS_TREE image = '32x32/catalog.png'}
+						{else}
+							{capture name = "t_empty_catalog_code"}
+							<table class = "emptyLessonsList">
+							    <tr><td class = "mediumHeader">There are no courses available at the moment</td></tr>
+					    	</table>
+							{/capture}
+							{eF_template_printBlock title = $smarty.const._COURSECATALOG data = $smarty.capture.t_empty_catalog_code image = '32x32/catalog.png'}						
+						{/if}
 					{/if}
 					
 					{capture name = "t_buy_balance_code"}

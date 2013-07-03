@@ -3,7 +3,7 @@
 	<title>BigBlueButton conference tool</title>
 	<author>Panagiotis Athanasopoulos</author>
 	<date>2011 2 25</date>
-	<version>1.2</version>
+	<version>1.3</version>
 	<description>
 		This module is used to connect eFront with BigBlueButton for lesson conferencing using the included API.
 	</description>

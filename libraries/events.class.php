@@ -832,7 +832,10 @@ class EfrontEvent
     			// If all conditions are satisfied (or no conditions exist)
     			if ($conditions_passed) {
 	    			// Set type - entity field: denoting the type of the event ."_". the ID of the involved entity (lesson, test, forum etc)
-	    	    	if ($this -> event['entity_ID']) {
+    				if ($this -> event['type'] == EfrontEvent::COURSE_PROGRAMMED_START || $this -> event['type'] == EfrontEvent::COURSE_PROGRAMMED_EXPIRY) {
+    					$event_notification['id_type_entity'] = $event_notification['id'] . "_" . $event_notification['event_type'] . "_" .  $this -> event['lessons_ID'];
+    					$negativeTypeEntity = "_" . (-1)*$event_notification['event_type'] . "_" .  $this -> event['lessons_ID'];    						
+    				} else if ($this -> event['entity_ID']) {
 	    				$event_notification['id_type_entity'] = $event_notification['id'] . "_" . $event_notification['event_type'] . "_" .  $this -> event['entity_ID'];
 	    				$negativeTypeEntity = "_" . (-1)*$event_notification['event_type'] . "_" .  $this -> event['entity_ID'];
 	    			} else if ($this -> event['lessons_ID']) {

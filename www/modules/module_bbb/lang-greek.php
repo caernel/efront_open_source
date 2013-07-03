@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 define("_BBB","BBB Συσκέψεις");
 define("_BBB_LESSONLINK", "BBB μαθημάτων");
 define("_BBB_MODULE", "BBB άρθρωμα");
@@ -63,4 +63,5 @@ define("_BBB_AREYOUSUREYOUWANTTOSTARTTHECONFERENCE", "Είστε σίγουρο�
 define("_BBB_RESETDEFAULTSERVER","Επαναφορά προεπιλεγμένου εξυπηρετητή");
 define("_BBB_IN","Σε");
 define("_BBB_NOW","Τώρα!");
+define("_BBB_LOGOUTURL", "Logout URL");
 ?>

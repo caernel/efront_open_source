@@ -333,7 +333,7 @@
 <!--ajax:lessonsTable-->
 								<table style = "width:100%" class = "sortedTable" activeFilter = 1 size = "{$T_LESSONS_SIZE}" sortBy = "0" useAjax = "1" id = "lessonsTable" rowsPerPage = "20" url = "administrator.php?ctg=lessons&">
 									<tr class = "topTitle">
-										<td class = "topTitle" name = "name">{$smarty.const._NAME} </td>
+										<td class = "topTitle" name = "name">{$smarty.const._LESSONNAME} </td>
 										<td class = "topTitle" name = "direction_name">{$smarty.const._CATEGORY}</td>
 										<td class = "topTitle centerAlign" name = "students">{$smarty.const._PARTICIPATION}</td>
 										<td class = "topTitle centerAlign" name = "course_only">{$smarty.const._AVAILABLE}</td>

@@ -70,9 +70,12 @@ if (isset($currentUser -> coreAccess['settings']) && $currentUser -> coreAccess[
             eF_deleteTableData("events", "lessons_ID = ". $currentLesson -> lesson['id'] . " AND (type = '".EfrontEvent::LESSON_PROGRAMMED_START. "' OR type = '". EfrontEvent::LESSON_PROGRAMMED_EXPIRY. "')");
 
             $currentLesson -> persist();
-            EfrontEvent::triggerEvent(array("type" => EfrontEvent::LESSON_PROGRAMMED_START,  "timestamp" => $fromTimestamp, "lessons_ID" => $currentLesson -> lesson['id'], "lessons_name" => $currentLesson -> lesson['name']));
-            EfrontEvent::triggerEvent(array("type" => EfrontEvent::LESSON_PROGRAMMED_EXPIRY, "timestamp" => $toTimestamp, "lessons_ID" => $currentLesson -> lesson['id'], "lessons_name" => $currentLesson -> lesson['name']));
-            
+            if ($fromTimestamp > time()) {
+            	EfrontEvent::triggerEvent(array("type" => EfrontEvent::LESSON_PROGRAMMED_START,  "timestamp" => $fromTimestamp, "lessons_ID" => $currentLesson -> lesson['id'], "lessons_name" => $currentLesson -> lesson['name']));
+            }
+            if ($toTimestamp > time()) {
+            	EfrontEvent::triggerEvent(array("type" => EfrontEvent::LESSON_PROGRAMMED_EXPIRY, "timestamp" => $toTimestamp, "lessons_ID" => $currentLesson -> lesson['id'], "lessons_name" => $currentLesson -> lesson['name']));
+            }
             $message      = _OPERATIONCOMPLETEDSUCCESSFULLY;
             $message_type = 'success';
         } else {

@@ -326,8 +326,16 @@ if ($form -> isSubmitted() && $form -> validate()) {
 				$editedEmployee = EfrontHcdUser :: createUser(array('users_login' => $editedUser->user['login']));
 				if ($currentEmployee -> isSupervisor() && !EfrontUser::isOptionVisible('show_unassigned_users_to_supervisors')) {//if supervisors can't see unassigned users, then attach this new user to the supervisor's firts branch and job
 					$branch = new EfrontBranch(current($currentEmployee -> getSupervisedBranchesRecursive()));
-					$job = current($branch -> getJobDescriptions());
-					$editedEmployee -> addJob($editedUser, $job['job_description_ID'], $branch->branch['branch_ID'], 0);
+					$nospecific = false;
+					foreach ($branch -> getJobDescriptions() as $value) {
+						if ($value['description'] == _NOSPECIFICJOB) {
+							$nospecific = $value['job_description_ID'];
+						}						
+					}
+					if (!$nospecific) {
+						$nospecific = EfrontJob::createJob(array('description' => _NOSPECIFICJOB, 'branch_ID' => $branch->branch['branch_ID']));
+					}
+					$editedEmployee -> addJob($editedUser, $nospecific, $branch->branch['branch_ID'], 0);
 				}
 			}
 		} #cpp#endif

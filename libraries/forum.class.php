@@ -180,11 +180,18 @@ class f_forums extends EfrontEntity
             EfrontSearch :: insertText(strip_tags($fields['comments']), $new_id, "f_forums", "data");
         }
          
+        $post_lesson_id = $post_lesson_name = null;
+        if (!empty($fields['lessons_ID']) && eF_checkParameter($fields['lessons_ID'], 'id')) { 
+        	$result = eF_getTableData("lessons", "id,name", "id={$fields['lessons_ID']}");
+        	$post_lesson_id = $result[0]['id'];
+        	$post_lesson_name =  $result[0]['name'];
+        }
+        
         // Timelines add event
         EfrontEvent::triggerEvent(array("type" => EfrontEvent::NEW_FORUM,
             							"users_LOGIN"  => $_SESSION['s_login'], 
-            							"lessons_ID"   => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['id'] : null, 
-            							"lessons_name" => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['name'] : null, 
+            							"lessons_ID"   => $post_lesson_id, 
+            							"lessons_name" => $post_lesson_name, 
             							"entity_ID"    => $new_id, 
             							"entity_name"  => $fields['title']));        
     }
@@ -330,13 +337,27 @@ class f_topics extends EfrontEntity
             EfrontSearch :: insertText(strip_tags($message_fields['body']), $new_id, "f_messages", "data");
         }
          
-        // Timelines add event
+        $post_lesson_id = $post_lesson_name = null;
+        $result = eF_getTableData("lessons l, f_forums f", "l.id,l.name", "l.id=f.lessons_ID and f.id={$fields['f_forums_ID']}");
+        if (!empty($result)) {
+        	$post_lesson_id = $result[0]['id'];
+        	$post_lesson_name =  $result[0]['name'];
+        }
+        
+        // Timelines add event for topic
         EfrontEvent::triggerEvent(array("type"         => EfrontEvent::NEW_TOPIC, 
             							"users_LOGIN"  => $_SESSION['s_login'], 
-            							"lessons_ID"   => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['id'] : null, 
-            							"lessons_name" => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['name'] : null, 
+            							"lessons_ID"   => $post_lesson_id, 
+            							"lessons_name" => $post_lesson_name, 
+            							"entity_ID"    => $topic_id, 
+            							"entity_name"  => $fields['title']));
+        //trigger event for message        
+        EfrontEvent::triggerEvent(array("type"         => EfrontEvent::NEW_FORUM_MESSAGE_POST, 
+            							"users_LOGIN"  => $_SESSION['s_login'], 
+            							"lessons_ID"   => $post_lesson_id, 
+            							"lessons_name" => $post_lesson_name, 
             							"entity_ID"    => $new_id, 
-            							"entity_name"  => $fields['title']));        
+            							"entity_name"  => $fields['title']));                
     }
     
     
@@ -439,11 +460,19 @@ class f_messages extends EfrontEntity {
             EfrontSearch :: insertText(strip_tags($fields['body']), $new_id, "f_messages", "data");
         }
          
+        $post_lesson_id = $post_lesson_name = null;
+        $result = eF_getTableData("lessons l, f_forums f, f_topics t", "l.id,l.name", "l.id=f.lessons_ID and f.id=t.f_forums_ID and t.id={$fields['f_topics_ID']}");
+        if (!empty($result)) {
+        	$post_lesson_id = $result[0]['id'];
+        	$post_lesson_name =  $result[0]['name'];
+        }
+        
+        
         // Timelines add event
         EfrontEvent::triggerEvent(array("type"         => EfrontEvent::NEW_FORUM_MESSAGE_POST, 
             							"users_LOGIN"  => $_SESSION['s_login'], 
-            							"lessons_ID"   => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['id'] : null, 
-            							"lessons_name" => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['name'] : null, 
+            							"lessons_ID"   => $post_lesson_id, 
+            							"lessons_name" => $post_lesson_name, 
             							"entity_ID"    => $new_id, 
             							"entity_name"  => $fields['title']));                
     }    
@@ -574,11 +603,19 @@ class f_poll extends EfrontEntity {
             EfrontSearch :: insertText(strip_tags($fields['question']), $new_id, "f_poll","data");
         }
 
+        $post_lesson_id = $post_lesson_name = null;
+        $result = eF_getTableData("lessons l, f_forums f", "l.id,l.name", "l.id=f.lessons_ID and f.id={$fields['f_forums_ID']}");
+        if (!empty($result)) {
+        	$post_lesson_id = $result[0]['id'];
+        	$post_lesson_name =  $result[0]['name'];
+        }
+        
+        
         // Timelines add event
         EfrontEvent::triggerEvent(array("type"		   => EfrontEvent::NEW_POLL, 
             							"users_LOGIN"  => $_SESSION['s_login'], 
-            							"lessons_ID"   => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['id'] : null, 
-            							"lessons_name" => isset($GLOBALS['currentLesson']) ? $GLOBALS['currentLesson'] -> lesson['name'] : null, 
+            							"lessons_ID"   => $post_lesson_id, 
+            							"lessons_name" => $post_lesson_name, 
             							"entity_ID"    => $new_id, 
             							"entity_name"  => $fields['title']));        
     }

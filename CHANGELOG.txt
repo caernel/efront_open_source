@@ -1,3 +1,22 @@
+=== Version 3.6.13.4 - build 18007 ===
+- v1.0 tincan statements are now explicitly rejected, until support is implemented
+- Added throttling to autosaving for tests
+- Users created by supervisors under a branch url, are not assigned the "no specific job position" by default
+- When sending a new personal message, the "Recipient by User type" can now act as a filter as well, rather than just as target
+- Improved periodic updater's performance
+- Updated training reports module's overall performance
+- Fixed course notifications being sent, even if schedule date was set to the past
+- Fixed access to lesson forums when the original forum was deleted
+- Fixed notification triggering for forums
+- Improved periodic updater's performance
+- Updated training period reports for improved performance
+- Updated jquery.js to 1.8.3, for improved compatibility with IE
+- Escaped illegal filenames for certificates in XML export
+- Fixed case-insensitive matching when importing users with custom user types
+- Fixed branch courses visibility
+- Outlook module invitations is now hidden for "student" supervisors
+- Supervised groups are now invisible for branches different than their assigned ones 
+
 === Version 3.6.13.3 - build 18006 ===
 - Added autosaving functionality for tests
 - Added total space and files used from the installation under system reports

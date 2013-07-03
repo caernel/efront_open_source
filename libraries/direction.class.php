@@ -505,28 +505,32 @@ class EfrontDirectionsTree extends EfrontTree
 		$iterator = $this -> initializeIterator($iterator, $lessons, $courses, $options);
 		$current	= $iterator -> current();
 
-		$treeString = '
-						<div id = "directions_tree">';
-
+		$treeStrings = array();
 		list($display, $display_lessons, $imageString, $classString) = $this -> getTreeDisplaySettings($options, $totalEntries);
 		$lessonsString = $coursesString = '';	
 		while ($iterator -> valid()) {
 			$lessonsString = $this -> printCategoryLessons($iterator, $display_lessons, $options, $lessons);
 			$coursesString = $this -> printCategoryCourses($iterator, $display, $userInfo, $options, $courses, $lessons, $originalLessons);
 //			if ($lessonsString || $coursesString) {
-				$treeString .= $this -> printCategoryTitle($iterator, $display, $imageString, $classString);
-				$treeString .= $lessonsString.$coursesString.'
+				$treeStrings[] = $this -> printCategoryTitle($iterator, $display, $imageString, $classString);
+				$treeStrings[] = $lessonsString.$coursesString.'
 							</table>';
 //			}
 			$iterator -> next();
 		}
 
-		if ($options['tree_tools']) {
-			$treeString = $this -> printTreeTools($options, $totalEntries).$treeString;		//This is put at the end, so that $this -> hasLessonsAsStudent is populated
+		if (!empty($treeStrings)) {
+			$treeString = '
+			<div id = "directions_tree">'.implode("", $treeStrings);
+			if ($options['tree_tools']) {
+				$treeString = $this -> printTreeTools($options, $totalEntries).$treeString;		//This is put at the end, so that $this -> hasLessonsAsStudent is populated
+			}
+			$treeString .= "</div>";
+			return $treeString;
+		} else {
+			return '';
 		}
-		$treeString .= "</div>";
 		
-		return $treeString;
 	}
 
 	private function parseTreeOptions($options) {

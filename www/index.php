@@ -1334,6 +1334,9 @@ if (isset($_GET['ctg']) && $_GET['ctg'] == 'contact') {                         
 	if ($_GET['limit_reached']) {
 		$form->setDefaults(array('message_subject' => _IWANTTOSIGNUPBUTMAXIMUMUSERSLIMITREACHED, 'message_body' => _IWANTTOSIGNUPBUTMAXIMUMUSERSLIMITREACHEDBODY));
 	}
+	if ($_SESSION['s_login']) {
+		$form->setDefaults(array('email' => $currentUser->user['email']));
+	}
 	
 	if ($form -> isSubmitted()) {
 		$fields_insert = array('users_LOGIN' => 'visitor',

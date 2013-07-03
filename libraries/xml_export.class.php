@@ -346,7 +346,6 @@ class XMLExport{
 		$p->SetTextColor($rgb['r'], $rgb['g'], $rgb['b']);
 		$p->SetFont($font, $fw, floatval($font_size));
 		$p->Text($x, $y, $txt);
-		pr($txt);
 	}
 	
 	private function showLabel2($p, $txt, $font, $font_weight, $font_size, $color, $x, $y){
@@ -367,7 +366,6 @@ class XMLExport{
 		$p->SetTextColor($rgb['r'], $rgb['g'], $rgb['b']);
 		$p->SetFont($font, $fw, floatval($font_size));
 		$p->MultiCell($x, $y, $txt);
-		pr($txt);
 	}
 
 	private function showImage($p, $file, $x, $y){

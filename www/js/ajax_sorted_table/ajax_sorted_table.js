@@ -627,18 +627,23 @@ function eF_js_sortTable(el, other) {
         var input = document.createElement('input');                        //Create a text box that will be used for the filtering function
         input.setAttribute('type', 'text');
         input.setAttribute('id', tableIndex+'_sortedTable_filter');           //Set its id to retrieve it easily
+       
+        $(input).writeAttribute('id', tableIndex+'_sortedTable_filter');
         //input.setAttribute('size', '10');           //Added by mpaltas **But removed from venakis due to IE incompatibility (sic)** to avoid overlapping - using a new table inside the td might be a better idea
         //input.setAttribute('onkeypress', 'if (event.which == 13) eF_js_filterData('+tableIndex+')');
-        input.setAttribute('onkeypress', 'if (event.which == 13 || event.keyCode == 13) {eF_js_filterData('+tableIndex+'); return false;}');       //Set an onkeypress event, so that pressing \"enter\" fires the function. We put the return false here, so that if the table is inside a form, enter will not submit it
         
-        input.onkeypress = function(e) {
+/*     Moved to 855 with prototype because of IE8 inconsistency  
+ * 	   input.setAttribute('onkeypress', ' var e = e || event;if (event.which == 13 || event.keyCode == 13 || e.which == 13 || e.keyCode == 13) {alert(event.keyCode);eF_js_filterData('+tableIndex+'); return false;}');       //Set an onkeypress event, so that pressing \"enter\" fires the function. We put the return false here, so that if the table is inside a form, enter will not submit it
+        
+       input.onkeypress = function(e) {
         	var e = e || event;
         	if (e.which == 13 || e.keyCode == 13) {
         		eF_js_filterData(tableIndex); 
         		return false;
     		}
         }
-        
+*/       
+   
         if (currentFilter[tableIndex] || currentBranchFilter[tableIndex] || currentJobFilter[tableIndex]) {
         	input.setAttribute("value", (currentFilter[tableIndex]));
         	
@@ -846,7 +851,20 @@ function eF_js_sortTable(el, other) {
                 tr.appendChild(td_checkbox);
             }
         }
-        
+                
+        $(tableIndex+'_sortedTable_filter').observe('keypress', keypressHandler);
+        function keypressHandler (event){
+            var key = event.which || event.keyCode;
+            switch (key) {
+                default:
+                break;
+                case Event.KEY_RETURN:
+                	eF_js_filterData(tableIndex); 
+            		return false;
+                break;   
+            }
+        }
+           
         var select_page = document.createElement('select');                      //Create a select element, that lists the pages
         select_page.setAttribute('id', tableIndex+'_sortedTable_currentPage');
         //select_page.setAttribute('onchange', 'eF_js_changePage('+tableIndex+', this.options[this.selectedIndex].value)');      //Set an onchange event, so that changing the value fires a change on the page

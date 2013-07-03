@@ -22,16 +22,20 @@ try {
 	$roles = EfrontUser :: getRoles(true);
 	$smarty -> assign("T_USERROLES",$roles);
 
-	$forums		= f_forums :: getAll("f_forums");	
+	$forums		= f_forums :: getAll("f_forums");
+	foreach ($forums as $value) {
+		$forums_to_lessons[$value['lessons_ID']] = $value['id'];
+	}
+
  	$lessons = EFrontLesson :: getLessons(false,true);
  	$res = eF_getTableData("lessons", "id,options");
  	foreach ($res as $value) {
  		$options = unserialize($value['options']);
- 		if (!$options['forum']) {
- 			unset($forums[$value['id']]);
+ 		if (!empty($options) && !$options['forum']) {
+ 			unset($forums[$forums_to_lessons[$value['id']]]);
  		}
  	}
- 	
+ 	//pr($forums);
     if (!$_admin_) {
         $userLessons = $currentUser -> getEligibleLessons();
         foreach ($forums as $key => $value) {
@@ -57,8 +61,12 @@ try {
     }
     $forumTree        = f_forums :: getForumTree($forums);
 
-    if (isset($_GET['forum']) && !in_array($_GET['forum'], $legalForumValues)) {
-        eF_redirect(basename($_SERVER['PHP_SELF'])."?ctg=forum&message=".urlencode(_UNPRIVILEGEDATTEMPT)."&message_type=failure");
+    if (isset($_GET['forum'])) {
+    	if (!$_GET['forum']) {
+    		eF_redirect(basename($_SERVER['PHP_SELF'])."?ctg=forum&message=".urlencode(_AFORUMDOESNOTEXISTFORTHISLESSONCREATE)."&message_type=failure");    		
+    	} else if (!in_array($_GET['forum'], $legalForumValues)) {
+    		eF_redirect(basename($_SERVER['PHP_SELF'])."?ctg=forum&message=".urlencode(_UNPRIVILEGEDATTEMPT)."&message_type=failure");
+    	}
     }
     if (isset($_GET['topic']) && !in_array($_GET['topic'], $legalTopicValues)) {
     	 eF_redirect(basename($_SERVER['PHP_SELF'])."?ctg=forum&message=".urlencode(_UNPRIVILEGEDATTEMPT)."&message_type=failure");
@@ -145,12 +153,11 @@ try {
 
         $entityForm = new HTML_QuickForm("forum_add_form", "post", basename($_SERVER['PHP_SELF'])."?ctg=forum".(isset($_GET['edit']) ? '&edit='.$_GET['edit'] : '&add=1')."&type=forum&parent_forum_id=".$_GET['parent_forum_id'], "", null, true);  //Build the form
         $entityForm -> addElement('select', 'lessons_ID', _ACCESSIBLEBYUSERSOFLESSON, $lessons);
-
-        if (isset($_SESSION['s_lessons_ID']) && $_SESSION['s_lessons_ID']) {
+        if ($_GET['parent_forum_id'] && in_array($_GET['parent_forum_id'], $legalForumValues)) {
+            $entityForm -> setDefaults(array('lessons_ID' => $forums[$_GET['parent_forum_id']]['lessons_ID']));
+        } elseif (isset($_SESSION['s_lessons_ID']) && $_SESSION['s_lessons_ID']) {
             $entityForm -> setDefaults(array('lessons_ID' => $_SESSION['s_lessons_ID']));
-        } elseif ($_GET['parent_forum_id'] && in_array($_GET['parent_forum_id'], $legalForumValues)) {
-            $entityForm -> setDefaults(array('lessons_ID' => $result[0]['lessons_ID']));
-        }
+        } 
 
         $entityName  = 'f_forums';
         $legalValues = $legalForumValues;

@@ -104,7 +104,7 @@ if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
 
 		try {
 			if ($form -> isSubmitted() && $form -> validate() && $_change_placements_) {
-				$values = $form -> exportValues();
+				$values = $form -> exportValues();				
 				if ($values['job'] && $values['branch']) {
 					require_once("module_hcd_tools.php");
 					$newJob = eF_getJobDescriptionId($values['job'], $values['branch']);
@@ -112,11 +112,12 @@ if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
 					if ($_GET['edit_placement']) {
 						if ($_GET['edit_placement'] != $newJob) {
 							$editedEmployee -> removeJob($_GET['edit_placement']);
-						} elseif (isset($userJobs[$newJob]) && $userJobs[$newJob]['supervisor'] != $values['position']) {
+						} elseif (isset($userJobs[$newJob]) && $userJobs[$newJob]['supervisor'] != $_POST['position']) {
 							$editedEmployee -> removeJob($_GET['edit_placement']);
 						}
 					}
-					$editedEmployee -> addJob($editedUser, $newJob , $values['branch'], $values['position']);
+				
+					$editedEmployee -> addJob($editedUser, $newJob , $values['branch'], $_POST['position']);
 
 					$message      = _OPERATIONCOMPLETEDSUCCESFULLY;
 					$message_type = 'success';

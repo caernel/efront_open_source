@@ -876,7 +876,7 @@ if (isset($_GET['add']) || (isset($_GET['edit']) && in_array($_GET['edit'], $leg
                     $newLessonPassed     = $newUserProgress[$currentLesson -> lesson['id']][$currentUser -> user['login']]['lesson_passed'];
 
                     $nextLesson = $currentUser -> getNextLesson($currentLesson, $_SESSION['s_courses_ID']);
-                    if ($currentLesson -> lesson['course_only']) {
+                    if ($currentLesson -> lesson['course_only'] && isset($_SESSION['s_courses_ID'])) {
 						$res = eF_getTableData("users_to_courses","issued_certificate","courses_ID=".$_SESSION['s_courses_ID']." and users_LOGIN='".$_SESSION['s_login']."'");
 						if ($res[0]['issued_certificate'] != "") {
 							$courseCertified = true;
@@ -897,7 +897,7 @@ if (isset($_GET['add']) || (isset($_GET['edit']) && in_array($_GET['edit'], $leg
                     $newLessonPassed     = $newUserProgress[$currentLesson -> lesson['id']][$currentUser -> user['login']]['lesson_passed'];
 
                     $nextLesson = $currentUser -> getNextLesson($currentLesson, $_SESSION['s_courses_ID']);
-					if ($currentLesson -> lesson['course_only']) {
+					if ($currentLesson -> lesson['course_only'] && isset($_SESSION['s_courses_ID'])) {
 						$res = eF_getTableData("users_to_courses","issued_certificate","courses_ID=".$_SESSION['s_courses_ID']." and users_LOGIN='".$_SESSION['s_login']."'");
 						if ($res[0]['issued_certificate'] != "") {
 							$courseCertified = true;

@@ -736,9 +736,12 @@ class EfrontImportCsv extends EfrontImport
 				case "users":
 					$existingUsers = eF_getTableDataFlat("users", "login, active, archive");
 					$roles = EfrontUser::getRoles();
-					$rolesTypes = EfrontUser::getRoles(true);
+					foreach (EfrontUser::getRoles(true) as $key => $value) {
+						$rolesTypes[$key] = mb_strtolower($value);
+					}					
 					$languages = EfrontSystem :: getLanguages();	
-					$addedUsers    = array();			
+					$addedUsers    = array();		
+					
 					foreach ($data as $key => $value) {
 						try {
 							$newUser = EfrontUser::createUser($value, $existingUsers, false);
@@ -757,12 +760,13 @@ class EfrontImportCsv extends EfrontImport
 											}
 										}
 									} 
+
 									if (!isset($value['user_type'])) {	
 										$value['user_type'] = 'student';
 									} else {
 										if (in_array(mb_strtolower($value['user_type']), $roles)) {
 											$value['user_type'] = mb_strtolower($value['user_type']);
-										} else if ($k=array_search($value['user_type'], $rolesTypes)) {
+										} else if ($k=array_search(mb_strtolower($value['user_type']), $rolesTypes)) {
 											$value['user_types_ID'] = $k;
 											$value['user_type'] = $roles[$k];
 										} else {
@@ -778,7 +782,7 @@ class EfrontImportCsv extends EfrontImport
 									} elseif (in_array($value['languages_NAME'], array_keys($languages)) === false) {
 										$value['languages_NAME'] = $GLOBALS['configuration']['default_language'];
 									}
-									
+										
 									$this -> updateExistingData($key+2, $type, $value);
 								} else {
 									$this -> log["failure"][] = _LINE . " ".($key+2).": " . $e -> getMessage();// ." ". str_replace("\n", "<BR>", $e->getTraceAsString());

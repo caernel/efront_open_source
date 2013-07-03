@@ -7,7 +7,7 @@
 */
 define("G_VERSIONTYPE_CODEBASE", "community");
 define("G_VERSIONTYPE", "community");
-define("G_BUILD", "18006");
+define("G_BUILD", "18007");
 
 //This file cannot be called directly, only included.
 if (str_replace(DIRECTORY_SEPARATOR, "/", __FILE__) == $_SERVER['SCRIPT_FILENAME']) {

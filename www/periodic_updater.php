@@ -21,64 +21,51 @@ define("NO_OUTPUT_BUFFERING", true);
 /** Configuration file.*/
 require_once $path."configuration.php";
 
-if (!isset($_SESSION['s_login']) || !eF_checkParameter($_SESSION['s_login'], 'login')) {
+if (empty($_SESSION['s_login']) || !eF_checkParameter($_SESSION['s_login'], 'login')) {
 	echo json_encode(array('status' => 0, 'code' => -1));
 	exit;
 }
 try {
 	if ($GLOBALS['configuration']['last_reset_certificate'] + 24*60*60 < time()) {
-		EfrontCourse :: checkCertificateExpire();
+		EfrontCourse :: checkCertificateExpire();		
 		EfrontConfiguration :: setValue('last_reset_certificate', time());
 	}
-	
-	
+
 	$newTime = '';
 	$jsonValues = array();
 	if ($_SESSION['s_login']) {
-		$entity = getUserTimeTarget($_GET['HTTP_REFERER']);
-		//$entity = $_SESSION['s_time_target'];
+		if (empty($_SESSION['last_periodic_check']) || time() - $_SESSION['last_periodic_check'] >= ceil($GLOBALS['configuration']['updater_period']/1000)) {
+			$_SESSION['last_periodic_check'] = time();
+			$entity = getUserTimeTarget($_GET['HTTP_REFERER']);
 			//Update times for this entity
-		$result = eF_executeNew("update user_times set time=time+(".time()."-timestamp_now),timestamp_now=".time()."
-								where session_expired = 0 and session_custom_identifier = '".$_SESSION['s_custom_identifier']."' and users_LOGIN = '".$_SESSION['s_login']."'
-									and entity = '".current($entity)."' and entity_id = '".key($entity)."'");
-		if ($_SESSION['s_lesson_user_type'] == 'student' && isset($_POST['user_total_time_in_unit']) && current($entity) == 'unit' && eF_checkParameter(key($entity), 'id')) {
-			$newTime = $_POST['user_total_time_in_unit'];
-			$jsonValues['entity'] = current($entity);
-			$jsonValues['entity_id'] = current($entity);
-			if ($newTime && is_numeric($newTime)) {
-				
-				//debug();
-				$result = eF_executeNew("insert into users_to_content (users_LOGIN, content_ID, lessons_ID) values('".$_SESSION['s_login']."', ".key($entity).", ".$_SESSION['s_lessons_ID'].") on duplicate key update total_time=$newTime");
-				$jsonValues['time_in_unit'] = EfrontTimes::formatTimeForReporting($newTime);
-				//$jsonValues['time_in_lesson'] = EfrontTimes::formatTimeForReporting((EfrontLesson::getUserActiveTimeInLesson($_SESSION['s_login'], $_SESSION['s_lessons_ID'])));
-				
-				//debug(false);
-/*				
-				$result = eF_executeNew("update user_times set time=$newTime,timestamp_now=".time()."
-										where session_expired = 0 and session_custom_identifier = '".$_SESSION['s_custom_identifier']."' and users_LOGIN = '".$_SESSION['s_login']."'
-										and entity = '".current($entity)."' and entity_id = '".key($entity)."'");
-*/										
-			} else {
-				$jsonValues['old_time_in_unit'] = EfrontTimes::formatTimeForReporting((EfrontLesson::getUserActiveTimeInUnit($_SESSION['s_login'], key($entity))));				
-				$jsonValues['old_time_in_lesson'] = EfrontTimes::formatTimeForReporting((EfrontLesson::getUserActiveTimeInLesson($_SESSION['s_login'], $_SESSION['s_lessons_ID'])));				
+			if ($_SESSION['s_lesson_user_type'] == 'student' && isset($_POST['user_total_time_in_unit']) && current($entity) == 'unit' && eF_checkParameter(key($entity), 'id')) {
+				$newTime = $_POST['user_total_time_in_unit'];
+				$jsonValues['entity'] = current($entity);
+				$jsonValues['entity_id'] = current($entity);
+				if ($newTime && is_numeric($newTime)) {
+					$result = eF_executeNew("insert into users_to_content (users_LOGIN, content_ID, lessons_ID) values('".$_SESSION['s_login']."', ".key($entity).", ".$_SESSION['s_lessons_ID'].") on duplicate key update total_time=$newTime");
+					$jsonValues['time_in_unit'] = EfrontTimes::formatTimeForReporting($newTime);
+				} else {
+					$jsonValues['old_time_in_unit'] = EfrontTimes::formatTimeForReporting((EfrontLesson::getUserActiveTimeInUnit($_SESSION['s_login'], key($entity))));
+					$jsonValues['old_time_in_lesson'] = EfrontTimes::formatTimeForReporting((EfrontLesson::getUserActiveTimeInLesson($_SESSION['s_login'], $_SESSION['s_lessons_ID'])));
+				}
 			}
-		}
 
-		try {
-			$currentUser = EfrontUser :: checkUserAccess();
-		} catch (Exception $e) {
-			if ($e -> getCode() == EfrontUserException :: USER_NOT_LOGGED_IN) {
-				echo json_encode(array('status' => 0, 'code' => -1));
-				exit;
-			}
+
+		
+			$result = eF_executeNew("update user_times set time=time+(".time()."-timestamp_now),timestamp_now=".time()."
+					where session_expired = 0 and session_custom_identifier = '".$_SESSION['s_custom_identifier']."' and users_LOGIN = '".$_SESSION['s_login']."'
+					and entity = '".current($entity)."' and entity_id = '".key($entity)."'");
+			
+			$jsonValues['online'] = EfrontUser :: getUsersOnline($GLOBALS['configuration']['autologout_time'] * 60);
+			$messages = eF_getTableData("f_personal_messages pm, f_folders ff", "count(*)", "pm.users_LOGIN='".$_SESSION['s_login']."' and viewed='no' and f_folders_ID=ff.id and ff.name='Incoming'");
+			$jsonValues['messages'] = $messages[0]['count(*)'];
+			$jsonValues['status'] = 1;
+			echo json_encode($jsonValues);
+		} else {
+			echo json_encode(array('status' => 1, 'code' => 0));
 		}
 	}
-	
-	$jsonValues['online'] = EfrontUser :: getUsersOnline($GLOBALS['configuration']['autologout_time'] * 60);
-	$messages = eF_getTableData("f_personal_messages pm, f_folders ff", "count(*)", "pm.users_LOGIN='".$_SESSION['s_login']."' and viewed='no' and f_folders_ID=ff.id and ff.name='Incoming'");
-	$jsonValues['messages'] = $messages[0]['count(*)'];
-	$jsonValues['status'] = 1;
-	echo json_encode($jsonValues);
 
 } catch (Exception $e) {
 	handleAjaxExceptions($e);

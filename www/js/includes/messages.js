@@ -140,7 +140,7 @@ function show_hide_additional_recipients() {
 function eF_js_selectRecipients(recipient) {
     if (enterprise) {
         $('lesson_recipients').disabled    = 'disabled';
-        $('user_type_recipients').disabled = 'disabled';
+        //$('user_type_recipients').disabled = 'disabled';
         $('branch_recipients').disabled    = 'disabled';
         $('include_subbranches').selected  = 'false';
         $('include_subbranches').style.visibility 		= 'hidden';
@@ -155,7 +155,7 @@ function eF_js_selectRecipients(recipient) {
     $('specific_course_completed_label').style.visibility = 'hidden';
     $('group_recipients').disabled 	   = 'disabled';
     $('lesson_recipients').disabled    = 'disabled';
-    $('user_type_recipients').disabled = 'disabled';
+    //$('user_type_recipients').disabled = 'disabled';
     $('lesson_professor_recipients').disabled    = 'disabled';
 
     switch (recipient) {
@@ -171,7 +171,7 @@ function eF_js_selectRecipients(recipient) {
             $('lesson_professor_recipients').disabled = '';
             break;
         case 'specific_type':
-            $('user_type_recipients').disabled = '';
+            //$('user_type_recipients').disabled = '';
             break;
         case 'specific_group':
             $('group_recipients').disabled = '';

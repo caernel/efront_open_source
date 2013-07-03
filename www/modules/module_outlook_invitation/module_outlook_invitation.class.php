@@ -28,7 +28,7 @@ class module_outlook_invitation extends EfrontModule {
 	 * @see libraries/EfrontModule#getPermittedRoles()
 	 */
 	public function getPermittedRoles() {
-		return array("administrator", "professor", "student");
+		return array("administrator", "professor");
 	}
 
 	/**

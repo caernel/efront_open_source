@@ -1508,19 +1508,20 @@ class EfrontTest
      
 		//$allTestQuestionsFilter = $allTestQuestions;
 		// lines added for redo only wrong questions
-		$allTestQuestionsFilter = array();
-		$resultCompleted = EfrontCompletedTest::retrieveCompletedTest("completed_tests ct join completed_tests_blob ctb on ct.id=ctb.completed_tests_ID", "ctb.test", "archive=1 AND users_LOGIN='".$_SESSION['s_login']."' AND tests_ID=".$this -> test['id'], "timestamp desc");		
-		$recentlyCompleted = unserialize($resultCompleted[0]['test']);
-
-		if ($recentlyCompleted -> redoOnlyWrong == true && !$done) {
-			foreach ($recentlyCompleted -> questions as $key => $value) {
-				if($value -> score != 100) {
-					$value -> userAnswer = false;
-					$allTestQuestionsFilter[$key] = $value;
-				}
-			}
-			$allTestQuestions = $allTestQuestionsFilter;
-		}
+        $allTestQuestionsFilter = array();
+        $resultCompleted = EfrontCompletedTest::retrieveCompletedTest("completed_tests ct join completed_tests_blob ctb on ct.id=ctb.completed_tests_ID", "ctb.test", "archive=1 AND users_LOGIN='".$_SESSION['s_login']."' AND tests_ID=".$this -> test['id'], "timestamp desc");
+        if (!empty($resultCompleted)) {
+        	$recentlyCompleted = unserialize($resultCompleted[0]['test']);
+        	if ($recentlyCompleted -> redoOnlyWrong == true && !$done) {
+        		foreach ($recentlyCompleted -> questions as $key => $value) {
+        			if($value -> score != 100) {
+        				$value -> userAnswer = false;
+        				$allTestQuestionsFilter[$key] = $value;
+        			}
+        		}
+        		$allTestQuestions = $allTestQuestionsFilter;
+        	}
+        }
 
         // If we have a random pool of question then get a random sub-array of the questions
         if ($this -> options['random_pool'] > 0 && $this -> options['random_pool'] < sizeof($allTestQuestions)) {	
@@ -1545,7 +1546,6 @@ class EfrontTest
             }
         }
 		$currentLesson  = $this -> getLesson(true);
-
         foreach ($testQuestions as $id => $question) {
             if ($done) {
                 switch ($question -> score) {
@@ -1562,15 +1562,14 @@ class EfrontTest
             }
 
             $weight = round(10000 * $this -> getQuestionWeight($question -> question['id'])) / 100;
-			if ($question -> time) {
+	        $timeSpentString = '';
+            if (!empty($question -> time)) {
 	            $timeSpent = eF_convertIntervalToTime($question -> question['estimate'] - $question -> time);
-	            $timeSpentString = '';
 				$timeSpent['hours']   ? $timeSpentString .= $timeSpent['hours']._HOURSSHORTHAND.'&nbsp;'     : null;
 	            $timeSpent['minutes'] ? $timeSpentString .= $timeSpent['minutes']._MINUTESSHORTHAND.'&nbsp;' : null;
 	            $timeSpent['seconds'] ? $timeSpentString .= $timeSpent['seconds']._SECONDSSHORTHAND.'&nbsp;' : null;
 				$timeSpentString ? $timeSpentString = _TIMESPENT.': '.$timeSpentString : null;
 			}
-
 			//The hidden span below the div is used in a js down() so as to know which question we are looking at
             $testString .= '
             		<div id = "question_'.$count.'" '.(!$done && $this -> options['onebyone'] ? 'style = "display:none"' : '').'>
@@ -1600,25 +1599,12 @@ class EfrontTest
 				}
 				
 				$questionString = $question -> toHTMLSolved(new HTML_QuickForm(), $showCorrectAnswers, $this -> options['given_answers']);
-/*				
-				if (!$GLOBALS['configuration']['disable_questions_pool'] && preg_match("#content/lessons/(\d+)/#", $questionString, $matches)) {
-					if ($matches[1] != $this -> test['lessons_ID']) {
-						$questionString = preg_replace("#content/lessons/(.*)\"#U", "content/lessons/".'${1}?bypass=true"', $questionString);
-					}
-				}	
-*/				
 				$testString .= $questionString;
 			} else {
-				if ($this->preview_correct) {
+				if (!empty($this->preview_correct)) {
 					$question->preview_correct = true;
 				}
 				$questionString = $question -> toHTML($form);
-/*				if (!$GLOBALS['configuration']['disable_questions_pool'] && preg_match("#content/lessons/(\d+)/#", $questionString, $matches)) {
-					if ($matches[1] != $this -> test['lessons_ID']) {	
-						$questionString = preg_replace("#content/lessons/(.*)\"#U", "content/lessons/".'${1}?bypass=true"', $questionString);	
-					}	
-				}
-*/				
 				$testString .= $questionString;
 			}
 			$testString .= '<br/></div>';
@@ -1685,9 +1671,9 @@ class EfrontTest
 
             }
         }
-
+        
         if (!$done && $this -> options['onebyone']) {
-        	if ($GLOBALS['rtl']) {
+        	if (!empty($GLOBALS['rtl'])) {
         		$next_question_handle = 'arrow_left.png';
         		$previous_question_handle = 'arrow_right.png';
         	} else {
@@ -1739,6 +1725,7 @@ class EfrontTest
             $form -> addElement("hidden", "answers_order", serialize($shuffleOrder));       //The questions' answers order is hold at a hidden element, so that it can be stored when the test is complete
         }
 */
+
         if ($storeCache) {
         	Cache::setCache('test:'.$this -> test['id'], $testString);
         }
@@ -1993,9 +1980,9 @@ class EfrontCompletedTest extends EfrontTest
     		}
     	}
     
-    	$this -> time['spent'] = $this -> time['spent'] + time() - $this -> time['resume'];        //Add the time passed since the last pause to the total test time
-    	$testInstance -> time['pause']  = 0;
-    	$testInstance -> time['resume'] = time();
+    	//$this -> time['spent'] = $this -> time['spent'] + time() - $this -> time['resume'];        //Add the time passed since the last pause to the total test time
+    	//$testInstance -> time['pause']  = 0;
+    	//$testInstance -> time['resume'] = time();
     	 
     	if ($currentQuestion) {
     		$this -> currentQuestion = $currentQuestion;
@@ -3410,11 +3397,11 @@ class MultipleManyQuestion extends Question implements iQuestion
      * @access public
      */
     public function toHTML(&$form) {
-        $this -> toHTMLQuickForm($form);                                           //Assign proper elements to the form
-        $renderer = new HTML_QuickForm_Renderer_ArraySmarty($foo);                //Get a smarty renderer, only because it reforms the form in a very convenient way for printing html
-
-        $form          -> accept($renderer);                                       //Render the form
-        $formArray      = $renderer -> toArray();                                  //Get the rendered form fields
+    	$this -> toHTMLQuickForm($form);                                           //Assign proper elements to the form
+    	$renderer = new HTML_QuickForm_Renderer_ArraySmarty($foo);                //Get a smarty renderer, only because it reforms the form in a very convenient way for printing html
+        
+    	$form          -> accept($renderer);                                       //Render the form
+    	$formArray      = $renderer -> toArray();                                  //Get the rendered form fields
 /*
         $questionString = '
                     <table class = "unsolvedQuestion">

@@ -1,5 +1,4 @@
 <?php
-
 //This file cannot be called directly, only included.
 if (str_replace(DIRECTORY_SEPARATOR, "/", __FILE__) == $_SERVER['SCRIPT_FILENAME']) {
     exit;
@@ -27,7 +26,7 @@ if (!$_student_) {
     $status = $test -> getStatus($currentUser, $_GET['show_solved_test']);
     $form    = new HTML_QuickForm("test_form", "post", basename($_SERVER['PHP_SELF']).'?view_unit='.$_GET['view_unit'], "", 'onsubmit = "$(\'submit_test\').disabled=true;"', true);
 	switch ($status['status']) {
-        case 'incomplete':
+        case 'incomplete':        	        	 
             if (!$testInstance  = unserialize($status['completedTest']['test'])) {
                 throw new EfrontTestException(_TESTCORRUPTEDASKRESETEXECUTION, EfrontTestException::CORRUPTED_TEST);
             }
@@ -37,15 +36,16 @@ if (!$_student_) {
                 //unset($testInstance -> currentQuestion);
                 $testInstance -> save();
             }
+            
             $remainingTime = $testInstance -> options['duration'] - $testInstance -> time['spent'] - (time() - $testInstance -> time['resume']);
 
             $nocache = false;
             if ($form -> isSubmitted() || ($testInstance -> options['duration'] && $remainingTime < 0) || $status['status'] == 'incomplete') {
                 $nocache = true;
             }
-            $testString    = $testInstance -> toHTMLQuickForm($form, false, false, false, $nocache);
+            $testString    = $testInstance -> toHTMLQuickForm($form, false, false, false, $nocache);            
             $testString    = $testInstance -> toHTML($testString, $remainingTime);
-
+            
             if ($testInstance -> options['duration'] && $remainingTime < 0) {
             	try {
 	                $values = $form -> exportValues();
@@ -184,7 +184,7 @@ if (!$_student_) {
             }
             break;
     }
-
+    
     if (isset($_GET['ajax']) && ($testInstance instanceOf EfrontCompletedTest)) { //in case redo() was called from maintain_history === 0
         $testInstance -> handleAjaxActions();
     }
@@ -226,9 +226,12 @@ if (!$_student_) {
         		}
         		
         		if (isset($_GET['auto_save'])) {
+        			 
         			$testInstance -> autoSave($values['question'], $_POST['goto_question']);
         			//$testInstance -> pause($values['question'], $_POST['goto_question']);
         			echo json_encode(array('success' => 1));
+        			
+        			exit;
         		} else if (isset($values['pause_test'])) {
         			$testInstance -> pause($values['question'], $_POST['goto_question']);
         			eF_redirect("".basename($_SERVER['PHP_SELF'])."?ctg=content&type=tests");

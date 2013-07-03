@@ -157,7 +157,7 @@ try {
             $courses    = eF_getTableDataFlat("courses", "id,name", "archive=0 and active=1", "name");
 
             $users = EfrontUser :: getUsers(true);
-            $roles = EfrontUser :: getRoles(true); 
+            $roles = EfrontUser :: getRoles(true);
         } else {
             $smarty -> assign("T_FULL_ACCESS", 0);
 
@@ -202,8 +202,8 @@ try {
         $form -> addElement('radio', 'recipients', null, null, 'specific_course',     		'onclick = "eF_js_selectRecipients(\'specific_course\')"');
         $form -> addElement('radio', 'recipients', null, null, 'specific_lesson', 	  	    'onclick = "eF_js_selectRecipients(\'specific_lesson\')"');
         $form -> addElement('radio', 'recipients', null, null, 'specific_lesson_professor', 'onclick = "eF_js_selectRecipients(\'specific_lesson_professor\')"');
-        $form -> addElement('radio', 'recipients', null, null, 'specific_type', 			'onclick = "eF_js_selectRecipients(\'specific_type\')"');
-        $form -> addElement('select', 'user_type',       null, $roles,   'id = "user_type_recipients" 		 class = "inputSelectLong" disabled = "disabled"');
+        $form -> addElement('checkbox', 'specific_type');
+        $form -> addElement('select', 'user_type',       null, $roles,   'class = "inputSelectLong"');
         $form -> addElement('select', 'specific_course', null, $courses, 'id = "course_recipients" 			 class = "inputSelectLong" disabled = "disabled"');
         $form -> addElement('select', 'lesson',          null, $lessons, 'id = "lesson_recipients" 			 class = "inputSelectLong" disabled = "disabled"');
         $form -> addElement('select', 'professor',       null, $lessons, 'id = "lesson_professor_recipients" class = "inputSelectLong" disabled = "disabled"');
@@ -240,68 +240,66 @@ try {
         /* **************************************************** */
         // GGET DATA FOR CREATING THE SELECTS
         if (G_VERSIONTYPE == 'enterprise') { #cpp#ifdef ENTERPRISE
-            $branches = eF_getTableData("module_hcd_branch", "branch_ID, name, father_branch_ID","","father_branch_ID ASC,branch_ID ASC");
-
-            if (!empty($branches)) {
-                $branches_list = array();
-                require_once ($path."module_hcd_tools.php");
-                $branches_list = eF_createBranchesTreeSelect($branches,1);
-                //pr($branches_list);
-                if (!$grant_full_access) {
-                    // Get all branches of interest for this employee - branches working and their subbranches
-                    $jobs = $currentEmployee -> getJobs();
-                    if (!empty($jobs)) {
-                        $mbranches_list = array();
-                        foreach ($jobs as $job) {
-                            $mbranches_list[$job['branch_ID']] = $branches_list[$job['branch_ID']];    //using the branch id as key to avoid duplicates
-                            $mbranch = new EfrontBranch($job['branch_ID']);
-                            $subbranches = $mbranch -> getAllSubbranches();
-                            foreach ($subbranches as $sbranch) {
-                                $mbranches_list[$sbranch] = $branches_list[$sbranch];
-                            }
-                        }
-
-                        $branches_list = $mbranches_list;
-                        $smarty -> assign("T_BRANCHES", 1);
-                    } else {
-                        $smarty -> assign("T_BRANCHES", 0);
-                    }
-                } else {
-                    $smarty -> assign("T_BRANCHES", 1);
-                }
-            } else {
+        	require_once ($path."module_hcd_tools.php");
+        
+        	$branchesTree = new EfrontBranchesTree();
+        	$branches_list = $branchesTree->toPathStringShortened();
+        	 
+        	if (!empty($branches_list)) {
+        		$smarty -> assign("T_BRANCHES", 1);
+        		if ($_SESSION['s_type'] != 'administrator') {
+        			if ($currentEmployee->isSupervisor()) {
+        				foreach ($currentEmployee->getSupervisedBranches() as $value) {
+        					$employee_branches[] = $value['branch_ID'];
+        				}        				
+        			} else {
+        				$employee_branches = $currentEmployee->getBranches(true);
+        			}
+        			
+        			if (!empty($employee_branches)) {
+        				foreach ($branches_list as $key => $value) {
+        					if (!in_array($key, $employee_branches)) {
+        						unset($branches_list[$key]);
+        					}
+        				}
+        			} else {
+        				$smarty -> assign("T_BRANCHES", 0);
+        			}
+        		}
+        		if ($grant_full_access) {
+        			
+        			if ($_SESSION['s_type'] != 'administrator') {
+        				$job_descriptions = eF_getTableData("module_hcd_job_description", "distinct description","branch_ID in (".implode(",", $employee_branches).")");        				
+        			} else {
+        				$job_descriptions = eF_getTableData("module_hcd_job_description", "distinct description","");
+        			}
+        			if (!empty($job_descriptions)) {
+        				$job_description_list = array("0" => _ANYJOBDESCRIPTION);
+        				foreach ($job_descriptions as $job_description) {
+        					$log = $job_description['description'];
+        					$job_description_list["$log"] = $job_description['description'];
+        				}
+        			} else {
+        				$job_description_list["0"] = _NOJOBDESCRIPTIONSSHAVEBEENREGISTERED;
+        				$disable_job_descriptions = "disabled=\"disabled\"";
+        			}
+        			 
+        			$skills = eF_getTableData("module_hcd_skills", "skill_ID, description","");
+        			$skills_list = array();
+        			if (!empty($skills)) {
+        				foreach ($skills as $skill) {
+        					$log = $skill['skill_ID'];
+        					$skills_list["$log"] = $skill['description'];
+        				}
+        			} else {
+        				$skills_list["0"] = _NOSKILLSHAVEBEENREGISTERED;
+        				$disable_skills = "disabled=\"disabled\"";
+        			}
+        		}
+        	} else {
                 $branches_list = array("0" => _NOBRANCHESHAVEBEENREGISTERED);
                 //        $branches_list[0] = _NOBRANCHESHAVEBEENREGISTERED;
                 $disable_branches = "disabled=\"disabled\"";
-            }
-            //TODO:PROBLEM
-            //pr($branches_list);
-
-            if ($grant_full_access) {
-                $job_descriptions = eF_getTableData("module_hcd_job_description", "distinct description","");
-
-                if (!empty($job_descriptions)) {
-                    $job_description_list = array("0" => _ANYJOBDESCRIPTION);
-                    foreach ($job_descriptions as $job_description) {
-                        $log = $job_description['description'];
-                        $job_description_list["$log"] = $job_description['description'];
-                    }
-                } else {
-                    $job_description_list["0"] = _NOJOBDESCRIPTIONSSHAVEBEENREGISTERED;
-                    $disable_job_descriptions = "disabled=\"disabled\"";
-                }
-
-                $skills = eF_getTableData("module_hcd_skills", "skill_ID, description","");
-                $skills_list = array();
-                if (!empty($skills)) {
-                    foreach ($skills as $skill) {
-                        $log = $skill['skill_ID'];
-                        $skills_list["$log"] = $skill['description'];
-                    }
-                } else {
-                    $skills_list["0"] = _NOSKILLSHAVEBEENREGISTERED;
-                    $disable_skills = "disabled=\"disabled\"";
-                }
             }
 
             $form -> addElement('radio', 'recipients', null, null, 'to_supervisors', 		'onclick = "eF_js_selectRecipients(\'to_supervisors\')"');
@@ -388,14 +386,12 @@ try {
             $form -> setDefaults(array('body' => $previous_text));
         }
         if ($form -> isSubmitted() && $form -> validate()) {
-            $values = $form -> exportValues();            
+            $values = $form -> exportValues();
+                        
             if ($_SESSION['s_type'] == 'student') {
             	$values['subject'] = strip_tags($values['subject']);
             	$values['body'] = strip_tags($values['body']);
             }
-            
-            // The field with the recipients is no longer mandatory: we should check if it is empty
-            //pr($values['recipient']);
 
 			if ($values['recipient']) {				
 				$result = eF_getTableData("users", "id,name,surname,login", "active=1 and archive=0");//@todo: change this, performance hog
@@ -471,16 +467,6 @@ try {
                      $lesson = new EfrontLesson($form -> exportValue('professor'));
                     $values['body'] = _THISPMISSENTLESSONPROFESSORS.' <a href='.G_SERVERNAME.'##EFRONTINNERLINK##.php?lessons_ID='.$form -> exportValue('professor').'>'.$lesson->lesson['name'].'</a><br />'.$values['body'];
                     break;
-                case 'specific_type':
-                    if (!is_numeric($form -> exportValue('user_type'))) {
-                        $result = eF_getTableDataFlat("users", "login", "users.active=1 AND users.user_type='".($form -> exportValue('user_type'))."'");
-                        $values['body'] = _THISPMISSENTUSERTYPE.' '.$form -> exportValue('user_type').'<br />'.$values['body'];
-                    } else {
-                        $result = eF_getTableDataFlat("users", "login", "users.active=1 AND users.user_types_ID='".($form -> exportValue('user_type'))."'");
-                        $userType = eF_getTableData("user_types","name","id=".$form -> exportValue('user_type'));
-                        $values['body'] = _THISPMISSENTUSERTYPE.' '.$userType[0]["name"].'<br />'.$values['body'];
-                    }
-                    break;
                 case 'specific_user':
                     $result = eF_getTableDataFlat("users", "login", "login = '".($form -> exportValue('user'))."'");
                     $values['body'] = _THISPMISSENTSPECIFICUSERS.'<br />'.$values['body'];
@@ -547,6 +533,19 @@ try {
 
                 default:
                     break;
+            }
+            
+            if ($values['specific_type']) {
+            	if (!is_numeric($form -> exportValue('user_type'))) {
+            		$filter_user_type = eF_getTableDataFlat("users", "login", "users.active=1 AND users.user_type='".($form -> exportValue('user_type'))."'");
+            	} else {
+            		$filter_user_type = eF_getTableDataFlat("users", "login", "users.active=1 AND users.user_types_ID='".($form -> exportValue('user_type'))."'");
+            	}
+            	if ($values['recipients'] == 'only_specific_users') {	//Meaning we only clicked on the checkbox for user types
+            		$result = $filter_user_type;
+            	} else {
+            		$result['login'] = array_intersect($result['login'], $filter_user_type['login']);
+            	}            	
             }
 
             if ($_SESSION['s_type'] != 'administrator' && $_SESSION['s_current_branch']) {	//this applies to supervisors only

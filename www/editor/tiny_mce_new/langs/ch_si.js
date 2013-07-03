@@ -544,6 +544,7 @@ general_props:"\u4E00\u822C",
 advanced_props:"\u9AD8\u7EA7"
 },
 media_dlg:{
+source:"\u5d4c\u5165\u539f\u59cb\u6a94",
 title:"\u63D2\u5165/\u7F16\u8F91\u5D4C\u5165\u5A92\u4F53",
 general:"\u4E00\u822C",
 advanced:"\u9AD8\u7EA7",
